@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 
+using namespace std;
+
 CborInput::CborInput(void *data, int size) {
 	this->data = (unsigned char *)data;
 	this->size = size;
@@ -57,7 +59,7 @@ CborReader::~CborReader() {
 void CborReader::run() {
 	while(1) {
 		if(state == STATE_TYPE) {
-			printf("STATE_TYPE\n");
+			//printf("STATE_TYPE\n");
 			if(input->hasBytes(1)) {
 				unsigned char type = input->getByte();
 				unsigned char majorType = type >> 5;
@@ -221,7 +223,7 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_PINT) {
-			printf("STATE_PINT\n");
+			//printf("STATE_PINT\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
@@ -245,7 +247,7 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_NINT) {
-			printf("STATE_NINT\n");
+			//printf("STATE_NINT\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
@@ -267,7 +269,7 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_BYTES_SIZE) {
-			printf("STATE_BYTES_SIZE\n");
+			//printf("STATE_BYTES_SIZE\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
@@ -291,7 +293,7 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_BYTES_DATA) {
-			printf("STATE_BYTES_DATA\n");
+			//printf("STATE_BYTES_DATA\n");
 			if(input->hasBytes(currentLength)) {
 				unsigned char *data = new unsigned char[currentLength];
 				input->getBytes(data, currentLength);
@@ -299,7 +301,7 @@ void CborReader::run() {
 				onBytes(data, currentLength);
 			} else break;
 		} else if(state == STATE_STRING_SIZE) {
-			printf("STATE_STRING_SIZE\n");
+			//printf("STATE_STRING_SIZE\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
@@ -323,12 +325,13 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_STRING_DATA) {
-			printf("STATE_STRING_DATA\n");
+			//printf("STATE_STRING_DATA\n");
 			if(input->hasBytes(currentLength)) {
 				unsigned char *data = new unsigned char[currentLength];
 				input->getBytes(data, currentLength);
 				state = STATE_TYPE;
-				onString(data, currentLength);
+				string str((const char *)data, (size_t)currentLength);
+				onString(str);
 			} else break;
 		} else if(state == STATE_ARRAY) {
 			printf("STATE_ARRAY\n");
@@ -355,7 +358,7 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_MAP) {
-			printf("STATE_MAP\n");
+			//printf("STATE_MAP\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
@@ -379,7 +382,7 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_TAG) {
-			printf("STATE_TAG\n");
+			//printf("STATE_TAG\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
@@ -391,7 +394,6 @@ void CborReader::run() {
 						state = STATE_TYPE;
 						break;
 					case 4:
-						// TODO: for integers > 2^31
 						onTag(input->getInt());
 						state = STATE_TYPE;
 						break;
@@ -403,7 +405,7 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_SPECIAL) {
-			printf("STATE_SPECIAL\n");
+			//printf("STATE_SPECIAL\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
@@ -477,7 +479,7 @@ int CborOutput::getSize() {
 	return offset;
 }
 
-void CborWriter::writeTypeAndValue(int majorType, int value) {
+void CborWriter::writeTypeAndValue(int majorType, unsigned int value) {
 	majorType <<= 5;
 	if(value < 24) {
 		output->putByte(majorType | value);
@@ -487,6 +489,7 @@ void CborWriter::writeTypeAndValue(int majorType, int value) {
 	} else if(value < 65536) {
 		output->putByte(majorType | 25);
 		output->putByte(value >> 8);
+		output->putByte(value);
 	} else {
 		output->putByte(majorType | 26);
 		output->putByte(value >> 24);
@@ -496,38 +499,89 @@ void CborWriter::writeTypeAndValue(int majorType, int value) {
 	}
 }
 
-void CborWriter::writeInt(int value) {
-	if(value < 0) {
-		writeTypeAndValue(1, -value);
+void CborWriter::writeTypeAndValue(int majorType, unsigned long long value) {
+	majorType <<= 5;
+	if(value < 24ULL) {
+		output->putByte(majorType | value);
+	} else if(value < 256ULL) {
+		output->putByte(majorType | 24);
+		output->putByte(value);
+	} else if(value < 65536ULL) {
+		output->putByte(majorType | 25);
+		output->putByte(value >> 8);
+	} else if(value < 4294967296ULL) {
+		output->putByte(majorType | 26);
+		output->putByte(value >> 24);
+		output->putByte(value >> 16);
+		output->putByte(value >> 8);
+		output->putByte(value);
 	} else {
-		writeTypeAndValue(0, value);
+		output->putByte(majorType | 27);
+		output->putByte(value >> 56);
+		output->putByte(value >> 48);
+		output->putByte(value >> 40);
+		output->putByte(value >> 32);
+		output->putByte(value >> 24);
+		output->putByte(value >> 16);
+		output->putByte(value >> 8);
+		output->putByte(value);
 	}
 }
 
-void CborWriter::writeBytes(const unsigned char *data, int size) {
+void CborWriter::writeInt(unsigned int value) {
+	writeTypeAndValue(0, value);
+}
+
+void CborWriter::writeInt(unsigned long long value) {
+	writeTypeAndValue(0, value);
+}
+
+void CborWriter::writeInt(long long value) {
+	if(value < 0) {
+		writeTypeAndValue(1, (unsigned long long) -value);
+	} else {
+		writeTypeAndValue(0, (unsigned long long) value);
+	}
+}
+
+void CborWriter::writeInt(int value) {
+	if(value < 0) {
+		writeTypeAndValue(1, (unsigned int) -value);
+	} else {
+		writeTypeAndValue(0, (unsigned int) value);
+	}
+}
+
+void CborWriter::writeBytes(const unsigned char *data, unsigned int size) {
 	writeTypeAndValue(2, size);
 	output->putBytes(data, size);
 }
 
-void CborWriter::writeString(const char *data, int size) {
+void CborWriter::writeString(const char *data, unsigned int size) {
 	writeTypeAndValue(3, size);
 	output->putBytes((const unsigned char *)data, size);
 }
 
+void CborWriter::writeString(const string str) {
+	writeTypeAndValue(3, (unsigned int)str.size());
+	output->putBytes((const unsigned char *)str.c_str(), str.size());
+}
+
+
 void CborWriter::writeArray(int size) {
-	writeTypeAndValue(4, size);
+	writeTypeAndValue(4, (unsigned int)size);
 }
 
 void CborWriter::writeMap(int size) {
-	writeTypeAndValue(5, size);
+	writeTypeAndValue(5, (unsigned int)size);
 }
 
-void CborWriter::writeTag(int tag) {
+void CborWriter::writeTag(const unsigned int tag) {
 	writeTypeAndValue(6, tag);
 }
 
 void CborWriter::writeSpecial(int special) {
-	writeTypeAndValue(7, special);
+	writeTypeAndValue(7, (unsigned int)special);
 }
 
 // TEST HANDLERS
@@ -540,8 +594,8 @@ void CborReader::onBytes(unsigned char *data, int size) {
 	printf("bytes with size: %d", size);
 }
 
-void CborReader::onString(unsigned char *data, int size) {
-	printf("string: '%.*s'\n", size, data);
+void CborReader::onString(string &str) {
+	printf("string: '%.*s'\n", str.size(), str.c_str());
 }
 
 void CborReader::onArray(int size) {
@@ -552,7 +606,7 @@ void CborReader::onMap(int size) {
 	printf("map: %d\n", size);
 }
 
-void CborReader::onTag(int tag) {
+void CborReader::onTag(unsigned int tag) {
 	printf("tag: %d\n", tag);
 }
 
@@ -564,7 +618,7 @@ void CborReader::onError(const char *error) {
 	printf("error: %s\n", error);
 }
 
-// TEST HANDLERS
+// TEST HANDLERTE
 
 void writeTest() {
 	CborOutput output(4096);
@@ -585,8 +639,9 @@ void writeTest() {
 	reader.run();
 }
 
-
+/*
 int main(int argc, char **argv) {
 	writeTest();
 	return 0;
 }
+*/

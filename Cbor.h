@@ -1,6 +1,7 @@
 #ifndef CBOR_H
 #define CBOR_H
 
+#include <string>
 
 class CborInput {
 public:
@@ -41,10 +42,10 @@ public:
 protected:
 	virtual void onInteger(int value);
 	virtual void onBytes(unsigned char *data, int size);
-	virtual void onString(unsigned char *data, int size);
+	virtual void onString(std::string &str);
 	virtual void onArray(int size);
 	virtual void onMap(int size);
-	virtual void onTag(int tag);
+	virtual void onTag(unsigned int tag);
 	virtual void onSpecial(int code);
 	virtual void onError(const char *error);
 private:
@@ -76,15 +77,25 @@ public:
 	~CborWriter();
 
 	void writeInt(int value);
-	void writeBytes(const unsigned char *data, int size);
-	void writeString(const char *data, int size);
+	void writeInt(long long value);
+	void writeInt(unsigned int value);
+	void writeInt(unsigned long long value);
+	void writeBytes(const unsigned char *data, unsigned int size);
+	void writeString(const char *data, unsigned int size);
+	void writeString(const std::string str);
 	void writeArray(int size);
 	void writeMap(int size);
-	void writeTag(int tag);
+	void writeTag(const unsigned int tag);
 	void writeSpecial(int special);
 private:
-	void writeTypeAndValue(int majorType, int value);
+	void writeTypeAndValue(int majorType, unsigned int value);
+	void writeTypeAndValue(int majorType, unsigned long long value);
 	CborOutput *output;
+};
+
+class CborSerializable {
+public:
+	virtual void Serialize(CborWriter &writer) = 0;
 };
 
 #endif
