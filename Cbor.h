@@ -34,21 +34,41 @@ typedef enum {
     STATE_SPECIAL
 } CborReaderState;
 
+
+
+class CborListener {
+public:
+	virtual void OnInteger(int value) = 0;
+	virtual void OnBytes(unsigned char *data, int size) = 0;
+	virtual void OnString(std::string &str) = 0;
+	virtual void OnArray(int size) = 0;
+	virtual void OnMap(int size) = 0;
+	virtual void OnTag(unsigned int tag) = 0;
+	virtual void OnSpecial(int code) = 0;
+	virtual void OnError(const char *error) = 0;
+};
+
+class CborDebugListener : public CborListener {
+public:
+	virtual void OnInteger(int value);
+	virtual void OnBytes(unsigned char *data, int size);
+	virtual void OnString(std::string &str);
+	virtual void OnArray(int size);
+	virtual void OnMap(int size);
+	virtual void OnTag(unsigned int tag);
+	virtual void OnSpecial(int code);
+	virtual void OnError(const char *error);
+};
+
 class CborReader {
 public:
 	CborReader(CborInput &input);
+	CborReader(CborInput &input, CborListener &listener);
 	~CborReader();
-	void run();
-protected:
-	virtual void onInteger(int value);
-	virtual void onBytes(unsigned char *data, int size);
-	virtual void onString(std::string &str);
-	virtual void onArray(int size);
-	virtual void onMap(int size);
-	virtual void onTag(unsigned int tag);
-	virtual void onSpecial(int code);
-	virtual void onError(const char *error);
+	void Run();
+	void SetListener(CborListener &listener);
 private:
+	CborListener *listener;
 	CborInput *input;
 	CborReaderState state;
 	int currentLength;

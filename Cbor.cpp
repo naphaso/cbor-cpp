@@ -1,7 +1,7 @@
 #include "Cbor.h"
 
 #include <string.h>
-#include <stdio.h>
+#include "log.h"
 
 using namespace std;
 
@@ -52,14 +52,23 @@ CborReader::CborReader(CborInput &input) {
 	this->state = STATE_TYPE;
 }
 
+CborReader::CborReader(CborInput &input, CborListener &listener) {
+	this->input = &input;
+	this->listener = &listener;
+	this->state = STATE_TYPE;
+}
+
 CborReader::~CborReader() {
 
 }
 
-void CborReader::run() {
+void CborReader::SetListener(CborListener &listener) {
+	this->listener = &listener;
+}
+
+void CborReader::Run() {
 	while(1) {
 		if(state == STATE_TYPE) {
-			//printf("STATE_TYPE\n");
 			if(input->hasBytes(1)) {
 				unsigned char type = input->getByte();
 				unsigned char majorType = type >> 5;
@@ -68,7 +77,7 @@ void CborReader::run() {
 				switch(majorType) {
 					case 0: // positive integer
 						if(minorType < 24) {
-							onInteger(minorType);
+							listener->OnInteger(minorType);
 						} else if(minorType == 24) { // 1 byte
 							currentLength = 1;
 							state = STATE_PINT;
@@ -82,12 +91,12 @@ void CborReader::run() {
 							currentLength = 8;
 							state = STATE_PINT;
 						} else {
-							onError("invalid integer type");
+							listener->OnError("invalid integer type");
 						}
 						break;
 					case 1: // negative integer
 						if(minorType < 24) {
-							onInteger(-minorType);
+							listener->OnInteger(-minorType);
 						} else if(minorType == 24) { // 1 byte
 							currentLength = 1;
 							state = STATE_NINT;
@@ -101,7 +110,7 @@ void CborReader::run() {
 							currentLength = 8;
 							state = STATE_NINT;
 						} else {
-							onError("invalid integer type");
+							listener->OnError("invalid integer type");
 						}
 						break;
 					case 2: // bytes
@@ -121,7 +130,7 @@ void CborReader::run() {
 							currentLength = 8;
 							state = STATE_BYTES_SIZE;
 						} else {
-							onError("invalid bytes type");
+							listener->OnError("invalid bytes type");
 						}
 						break;
 					case 3: // string
@@ -141,12 +150,12 @@ void CborReader::run() {
 							currentLength = 8;
 							state = STATE_STRING_SIZE;
 						} else {
-							onError("invalid string type");
+							listener->OnError("invalid string type");
 						}
 						break;
 					case 4: // array
 						if(minorType < 24) {
-							onArray(minorType);
+							listener->OnArray(minorType);
 						} else if(minorType == 24) {
 							state = STATE_ARRAY;
 							currentLength = 1;
@@ -160,12 +169,12 @@ void CborReader::run() {
 							currentLength = 8;
 							state = STATE_ARRAY;
 						} else {
-							onError("invalid array type");
+							listener->OnError("invalid array type");
 						}
 						break;
 					case 5: // map
 						if(minorType < 24) {
-							onMap(minorType);
+							listener->OnMap(minorType);
 						} else if(minorType == 24) {
 							state = STATE_MAP;
 							currentLength = 1;
@@ -179,12 +188,12 @@ void CborReader::run() {
 							currentLength = 8;
 							state = STATE_MAP;
 						} else {
-							onError("invalid array type");
+							listener->OnError("invalid array type");
 						}
 						break;
 					case 6: // tag
 						if(minorType < 24) {
-							onTag(minorType);
+							listener->OnTag(minorType);
 						} else if(minorType == 24) {
 							state = STATE_TAG;
 							currentLength = 1;
@@ -198,12 +207,12 @@ void CborReader::run() {
 							currentLength = 8;
 							state = STATE_TAG;
 						} else {
-							onError("invalid tag type");
+							listener->OnError("invalid tag type");
 						}
 						break;
 					case 7: // special
 						if(minorType < 24) {
-							onSpecial(minorType);
+							listener->OnSpecial(minorType);
 						} else if(minorType == 24) {
 							state = STATE_SPECIAL;
 							currentLength = 1;
@@ -217,26 +226,25 @@ void CborReader::run() {
 							currentLength = 8;
 							state = STATE_SPECIAL;
 						} else {
-							onError("invalid special type");
+							listener->OnError("invalid special type");
 						}
 						break;
 				}
 			} else break;
 		} else if(state == STATE_PINT) {
-			//printf("STATE_PINT\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
-						onInteger(input->getByte());
+						listener->OnInteger(input->getByte());
 						state = STATE_TYPE;
 						break;
 					case 2:
-						onInteger(input->getShort());
+						listener->OnInteger(input->getShort());
 						state = STATE_TYPE;
 						break;
 					case 4:
 						// TODO: for integers > 2^31
-						onInteger(input->getInt());
+						listener->OnInteger(input->getInt());
 						state = STATE_TYPE;
 						break;
 					case 8:
@@ -247,20 +255,19 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_NINT) {
-			//printf("STATE_NINT\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
-						onInteger(-(int)input->getByte());
+						listener->OnInteger(-(int)input->getByte());
 						state = STATE_TYPE;
 						break;
 					case 2:
-						onInteger(-(int)input->getShort());
+						listener->OnInteger(-(int)input->getShort());
 						state = STATE_TYPE;
 						break;
 					case 4:
 						// TODO: for integers > 2^31
-						onInteger(-(int)input->getInt());
+						listener->OnInteger(-(int)input->getInt());
 						state = STATE_TYPE;
 						break;
 					case 8:
@@ -269,7 +276,6 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_BYTES_SIZE) {
-			//printf("STATE_BYTES_SIZE\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
@@ -293,15 +299,13 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_BYTES_DATA) {
-			//printf("STATE_BYTES_DATA\n");
 			if(input->hasBytes(currentLength)) {
 				unsigned char *data = new unsigned char[currentLength];
 				input->getBytes(data, currentLength);
 				state = STATE_TYPE;
-				onBytes(data, currentLength);
+				listener->OnBytes(data, currentLength);
 			} else break;
 		} else if(state == STATE_STRING_SIZE) {
-			//printf("STATE_STRING_SIZE\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
@@ -325,28 +329,26 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_STRING_DATA) {
-			//printf("STATE_STRING_DATA\n");
 			if(input->hasBytes(currentLength)) {
 				unsigned char *data = new unsigned char[currentLength];
 				input->getBytes(data, currentLength);
 				state = STATE_TYPE;
 				string str((const char *)data, (size_t)currentLength);
-				onString(str);
+				listener->OnString(str);
 			} else break;
 		} else if(state == STATE_ARRAY) {
-			printf("STATE_ARRAY\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
-						onArray(input->getByte());
+						listener->OnArray(input->getByte());
 						state = STATE_TYPE;
 						break;
 					case 2:
-						onArray(currentLength = input->getShort());
+						listener->OnArray(currentLength = input->getShort());
 						state = STATE_TYPE;
 						break;
 					case 4:
-						onArray(input->getInt());
+						listener->OnArray(input->getInt());
 						state = STATE_TYPE;
 						break;
 					case 8:
@@ -358,19 +360,18 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_MAP) {
-			//printf("STATE_MAP\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
-						onMap(input->getByte());
+						listener->OnMap(input->getByte());
 						state = STATE_TYPE;
 						break;
 					case 2:
-						onMap(currentLength = input->getShort());
+						listener->OnMap(currentLength = input->getShort());
 						state = STATE_TYPE;
 						break;
 					case 4:
-						onMap(input->getInt());
+						listener->OnMap(input->getInt());
 						state = STATE_TYPE;
 						break;
 					case 8:
@@ -382,19 +383,18 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_TAG) {
-			//printf("STATE_TAG\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
-						onTag(input->getByte());
+						listener->OnTag(input->getByte());
 						state = STATE_TYPE;
 						break;
 					case 2:
-						onTag(input->getShort());
+						listener->OnTag(input->getShort());
 						state = STATE_TYPE;
 						break;
 					case 4:
-						onTag(input->getInt());
+						listener->OnTag(input->getInt());
 						state = STATE_TYPE;
 						break;
 					case 8:
@@ -405,20 +405,19 @@ void CborReader::run() {
 				}
 			} else break;
 		} else if(state == STATE_SPECIAL) {
-			//printf("STATE_SPECIAL\n");
 			if(input->hasBytes(currentLength)) {
 				switch(currentLength) {
 					case 1:
-						onSpecial(input->getByte());
+						listener->OnSpecial(input->getByte());
 						state = STATE_TYPE;
 						break;
 					case 2:
-						onSpecial(input->getShort());
+						listener->OnSpecial(input->getShort());
 						state = STATE_TYPE;
 						break;
 					case 4:
 						// TODO: for integers > 2^31
-						onSpecial(input->getInt());
+						listener->OnSpecial(input->getInt());
 						state = STATE_TYPE;
 						break;
 					case 8:
@@ -429,7 +428,7 @@ void CborReader::run() {
 				}
 			} else break;
 		} else {
-			printf("UNKNOWN STATE\n");
+			logger("UNKNOWN STATE");
 		}
 	}
 }
@@ -445,21 +444,19 @@ CborOutput::~CborOutput() {
 }
 
 void CborOutput::putByte(unsigned char value) {
-	fprintf(stderr, "put byte %d, current offset %d\n", value, offset);
 	if(offset < capacity) {
 		buffer[offset++] = value;
 	} else {
-		fprintf(stderr, "%s\n", "buffer overflow error");
+		logger("buffer overflow error");
 	}
 }
 
 void CborOutput::putBytes(const unsigned char *data, int size) {
-	fprintf(stderr, "put bytes with size %d, current offset %d\n", size, offset);
 	if(offset + size - 1 < capacity) {
 		memcpy(buffer + offset, data, size);
 		offset += size;
 	} else {
-		fprintf(stderr, "%s\n", "buffer overflow error");	
+		logger("buffer overflow error");	
 	}
 }
 
@@ -586,35 +583,35 @@ void CborWriter::writeSpecial(int special) {
 
 // TEST HANDLERS
 
-void CborReader::onInteger(int value) {
+void CborDebugListener::OnInteger(int value) {
 	printf("integer: %d\n", value);
 }
 
-void CborReader::onBytes(unsigned char *data, int size) {
+void CborDebugListener::OnBytes(unsigned char *data, int size) {
 	printf("bytes with size: %d", size);
 }
 
-void CborReader::onString(string &str) {
-	printf("string: '%.*s'\n", str.size(), str.c_str());
+void CborDebugListener::OnString(string &str) {
+	printf("string: '%.*s'\n", (int)str.size(), str.c_str());
 }
 
-void CborReader::onArray(int size) {
+void CborDebugListener::OnArray(int size) {
 	printf("array: %d\n", size);
 }
 
-void CborReader::onMap(int size) {
+void CborDebugListener::OnMap(int size) {
 	printf("map: %d\n", size);
 }
 
-void CborReader::onTag(unsigned int tag) {
+void CborDebugListener::OnTag(unsigned int tag) {
 	printf("tag: %d\n", tag);
 }
 
-void CborReader::onSpecial(int code) {
+void CborDebugListener::OnSpecial(int code) {
 	printf("special: %d\n", code);
 }
 
-void CborReader::onError(const char *error) {
+void CborDebugListener::OnError(const char *error) {
 	printf("error: %s\n", error);
 }
 
@@ -636,7 +633,7 @@ void writeTest() {
 
 	CborInput input(data, size);
 	CborReader reader(input);
-	reader.run();
+	reader.Run();
 }
 
 /*
