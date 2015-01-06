@@ -12,7 +12,7 @@
 	   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	   See the License for the specific language governing permissions and
 	   limitations under the License.
- */
+*/
 #ifndef CBOR_H
 #define CBOR_H
 
@@ -89,20 +89,44 @@ private:
 	int currentLength;
 };
 
-
 class CborOutput {
 public:
-	CborOutput(int capacity);
-	~CborOutput();
-	unsigned char *getData();
-	int getSize();
+    virtual unsigned char *getData() = 0;
+    virtual unsigned int getSize() = 0;
+    virtual void putByte(unsigned char value) = 0;
+    virtual void putBytes(const unsigned char *data, int size) = 0;
+};
 
-	void putByte(unsigned char value);
-	void putBytes(const unsigned char *data, int size);
+class CborStaticOutput : public CborOutput {
+public:
+	CborStaticOutput(unsigned int capacity);
+	~CborStaticOutput();
+	virtual unsigned char *getData();
+	virtual unsigned int getSize();
+	virtual void putByte(unsigned char value);
+	virtual void putBytes(const unsigned char *data, int size);
 private:
 	unsigned char *buffer;
-	int capacity;
-	int offset;
+	unsigned int capacity;
+	unsigned int offset;
+};
+
+class CborDynamicOutput : public CborOutput {
+public:
+    CborDynamicOutput();
+    CborDynamicOutput(unsigned int initalCapacity);
+    ~CborDynamicOutput();
+
+
+    virtual unsigned char *getData();
+    virtual unsigned int getSize();
+    virtual void putByte(unsigned char value);
+    virtual void putBytes(const unsigned char *data, int size);
+private:
+    void init(unsigned int initalCapacity);
+    unsigned char *buffer;
+    unsigned int capacity;
+    unsigned int offset;
 };
 
 

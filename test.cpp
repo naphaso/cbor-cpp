@@ -13,14 +13,28 @@
 	   See the License for the specific language governing permissions and
 	   limitations under the License.
 */
-	   
-#ifndef LOG_H_
-#define LOG_H_
+#include "Cbor.h"
 
-#include <stdio.h>
+class CborExampleListener : public CborDebugListener {
 
-#define logger(line) fprintf(stderr, "%s:%d [%s]: %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, line)
-#define loggerf(format, ...) fprintf(stderr, "%s:%d [%s]: " format "\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__)
+};
 
-#endif
+int main(int argc, char **argv) {
+    CborDynamicOutput output;
+    CborWriter writer(output);
 
+    writer.writeArray(10000 * 3);
+    for(int i = 0; i < 10000; i++) {
+        writer.writeInt(123);
+        writer.writeInt(12);
+        writer.writeString("hello", 5);
+    }
+
+    CborInput input(output.getData(), output.getSize());
+    CborDebugListener listener;
+    CborReader reader(input);
+    reader.SetListener(listener);
+    reader.Run();
+
+    return 0;
+}

@@ -12,10 +12,11 @@
 	   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	   See the License for the specific language governing permissions and
 	   limitations under the License.
- */
+*/
 #include "Cbor.h"
 
 #include <string.h>
+#include <stdlib.h>
 #include "log.h"
 
 using namespace std;
@@ -448,17 +449,17 @@ void CborReader::Run() {
 	}
 }
 
-CborOutput::CborOutput(int capacity) {
+CborStaticOutput::CborStaticOutput(unsigned int capacity) {
 	this->capacity = capacity;
 	this->buffer = new unsigned char[capacity];
 	this->offset = 0;
 }
 
-CborOutput::~CborOutput() {
+CborStaticOutput::~CborStaticOutput() {
 	delete buffer;
 }
 
-void CborOutput::putByte(unsigned char value) {
+void CborStaticOutput::putByte(unsigned char value) {
 	if(offset < capacity) {
 		buffer[offset++] = value;
 	} else {
@@ -466,7 +467,7 @@ void CborOutput::putByte(unsigned char value) {
 	}
 }
 
-void CborOutput::putBytes(const unsigned char *data, int size) {
+void CborStaticOutput::putBytes(const unsigned char *data, int size) {
 	if(offset + size - 1 < capacity) {
 		memcpy(buffer + offset, data, size);
 		offset += size;
@@ -483,13 +484,62 @@ CborWriter::~CborWriter() {
 
 }
 
-unsigned char *CborOutput::getData() {
+unsigned char *CborStaticOutput::getData() {
 	return buffer;
 }
 
-int CborOutput::getSize() {
+unsigned int CborStaticOutput::getSize() {
 	return offset;
 }
+
+
+CborDynamicOutput::CborDynamicOutput() {
+    init(256);
+}
+
+CborDynamicOutput::CborDynamicOutput(unsigned int initalCapacity) {
+    init(initalCapacity);
+}
+
+CborDynamicOutput::~CborDynamicOutput() {
+    delete buffer;
+}
+
+void CborDynamicOutput::init(unsigned int initalCapacity) {
+    this->capacity = initalCapacity;
+    this->buffer = new unsigned char[initalCapacity];
+    this->offset = 0;
+}
+
+
+unsigned char *CborDynamicOutput::getData() {
+    return buffer;
+}
+
+unsigned int CborDynamicOutput::getSize() {
+    return offset;
+}
+
+void CborDynamicOutput::putByte(unsigned char value) {
+    if(offset < capacity) {
+        buffer[offset++] = value;
+    } else {
+        capacity *= 2;
+        buffer = (unsigned char *) realloc(buffer, capacity);
+        buffer[offset++] = value;
+    }
+}
+
+void CborDynamicOutput::putBytes(const unsigned char *data, int size) {
+    while(offset + size > capacity) {
+        capacity *= 2;
+        buffer = (unsigned char *) realloc(buffer, capacity);
+    }
+
+    memcpy(buffer + offset, data, size);
+    offset += size;
+}
+
 
 void CborWriter::writeTypeAndValue(int majorType, unsigned int value) {
 	majorType <<= 5;
@@ -630,30 +680,3 @@ void CborDebugListener::OnError(const char *error) {
 	printf("error: %s\n", error);
 }
 
-// TEST HANDLERTE
-
-void writeTest() {
-	CborOutput output(4096);
-	CborWriter writer(output);
-
-	writer.writeArray(3);
-	writer.writeInt(123);
-	writer.writeInt(12);
-	writer.writeString("hello", 5);
-
-	//fwrite(output.getData(), 1, output.getSize(), stdout);
-
-	unsigned char *data = output.getData();
-	int size = output.getSize();
-
-	CborInput input(data, size);
-	CborReader reader(input);
-	reader.Run();
-}
-
-/*
-int main(int argc, char **argv) {
-	writeTest();
-	return 0;
-}
-*/

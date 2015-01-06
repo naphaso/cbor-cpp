@@ -12,7 +12,7 @@ Just a simple SAX-like Concise Binary Object Representation (CBOR).
 Writing:
 
 ```C++
-  CborOutput output(9000);
+  CborDynamicOutput output;
   CborWriter writer(output);
 
   writer.writeTag(123);
