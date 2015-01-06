@@ -14,12 +14,9 @@
 	   limitations under the License.
 */
 #include "Cbor.h"
+#include <climits>
 
-class CborExampleListener : public CborDebugListener {
-
-};
-
-int main(int argc, char **argv) {
+void test1() {
     CborDynamicOutput output;
     CborWriter writer(output);
 
@@ -35,6 +32,29 @@ int main(int argc, char **argv) {
     CborReader reader(input);
     reader.SetListener(listener);
     reader.Run();
+}
+
+void test2() {
+    CborDynamicOutput output;
+    CborWriter writer(output);
+
+    writer.writeInt(INT_MIN + 1);
+    writer.writeInt(INT_MIN);
+    writer.writeInt((long long)INT_MIN - 1);
+
+    writer.writeInt(INT_MAX - 1);
+    writer.writeInt(INT_MAX);
+    writer.writeInt((long long) INT_MAX + 1);
+
+    CborInput input(output.getData(), output.getSize());
+    CborDebugListener listener;
+    CborReader reader(input);
+    reader.SetListener(listener);
+    reader.Run();
+}
+
+int main(int argc, char **argv) {
+    test1();
 
     return 0;
 }

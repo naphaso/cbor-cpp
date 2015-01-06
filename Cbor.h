@@ -46,7 +46,8 @@ typedef enum {
     STATE_ARRAY,
     STATE_MAP,
     STATE_TAG,
-    STATE_SPECIAL
+    STATE_SPECIAL,
+    STATE_ERROR
 } CborReaderState;
 
 
@@ -59,8 +60,12 @@ public:
 	virtual void OnArray(int size) = 0;
 	virtual void OnMap(int size) = 0;
 	virtual void OnTag(unsigned int tag) = 0;
-	virtual void OnSpecial(int code) = 0;
+	virtual void OnSpecial(unsigned int code) = 0;
 	virtual void OnError(const char *error) = 0;
+
+    virtual void OnExtraInteger(unsigned long long value, int sign) {}
+    virtual void OnExtraTag(unsigned long long tag) {}
+    virtual void OnExtraSpecial(unsigned long long tag) {}
 };
 
 class CborDebugListener : public CborListener {
@@ -71,8 +76,12 @@ public:
 	virtual void OnArray(int size);
 	virtual void OnMap(int size);
 	virtual void OnTag(unsigned int tag);
-	virtual void OnSpecial(int code);
+	virtual void OnSpecial(unsigned int code);
 	virtual void OnError(const char *error);
+
+    virtual void OnExtraInteger(unsigned long long value, int sign);
+    virtual void OnExtraTag(unsigned long long tag);
+    virtual void OnExtraSpecial(unsigned long long tag);
 };
 
 class CborReader {

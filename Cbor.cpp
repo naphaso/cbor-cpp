@@ -17,6 +17,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <climits>
 #include "log.h"
 
 using namespace std;
@@ -83,6 +84,7 @@ void CborReader::SetListener(CborListener &listener) {
 }
 
 void CborReader::Run() {
+    unsigned int temp;
 	while(1) {
 		if(state == STATE_TYPE) {
 			if(input->hasBytes(1)) {
@@ -107,6 +109,7 @@ void CborReader::Run() {
 							currentLength = 8;
 							state = STATE_PINT;
 						} else {
+                            state = STATE_ERROR;
 							listener->OnError("invalid integer type");
 						}
 						break;
@@ -126,6 +129,7 @@ void CborReader::Run() {
 							currentLength = 8;
 							state = STATE_NINT;
 						} else {
+                            state = STATE_ERROR;
 							listener->OnError("invalid integer type");
 						}
 						break;
@@ -146,6 +150,7 @@ void CborReader::Run() {
 							currentLength = 8;
 							state = STATE_BYTES_SIZE;
 						} else {
+                            state = STATE_ERROR;
 							listener->OnError("invalid bytes type");
 						}
 						break;
@@ -166,6 +171,7 @@ void CborReader::Run() {
 							currentLength = 8;
 							state = STATE_STRING_SIZE;
 						} else {
+                            state = STATE_ERROR;
 							listener->OnError("invalid string type");
 						}
 						break;
@@ -185,6 +191,7 @@ void CborReader::Run() {
 							currentLength = 8;
 							state = STATE_ARRAY;
 						} else {
+                            state = STATE_ERROR;
 							listener->OnError("invalid array type");
 						}
 						break;
@@ -204,6 +211,7 @@ void CborReader::Run() {
 							currentLength = 8;
 							state = STATE_MAP;
 						} else {
+                            state = STATE_ERROR;
 							listener->OnError("invalid array type");
 						}
 						break;
@@ -223,6 +231,7 @@ void CborReader::Run() {
 							currentLength = 8;
 							state = STATE_TAG;
 						} else {
+                            state = STATE_ERROR;
 							listener->OnError("invalid tag type");
 						}
 						break;
@@ -242,6 +251,7 @@ void CborReader::Run() {
 							currentLength = 8;
 							state = STATE_SPECIAL;
 						} else {
+                            state = STATE_ERROR;
 							listener->OnError("invalid special type");
 						}
 						break;
@@ -259,14 +269,17 @@ void CborReader::Run() {
 						state = STATE_TYPE;
 						break;
 					case 4:
-						// TODO: for integers > 2^31
-						listener->OnInteger(input->getInt());
+                        temp = input->getInt();
+                        if(temp <= INT_MAX) {
+                            listener->OnInteger(temp);
+                        } else {
+                            listener->OnExtraInteger(temp, 1);
+                        }
 						state = STATE_TYPE;
 						break;
 					case 8:
-						input->getLong();
+                        listener->OnExtraInteger(input->getLong(), 1);
 						state = STATE_TYPE;
-						// TODO: implement it
 						break;
 				}
 			} else break;
@@ -282,12 +295,18 @@ void CborReader::Run() {
 						state = STATE_TYPE;
 						break;
 					case 4:
-						// TODO: for integers > 2^31
-						listener->OnInteger(-(int)input->getInt());
+						temp = input->getInt();
+                        if(temp <= INT_MAX) {
+                            listener->OnInteger(-(int) temp);
+                        } else if(temp == 2147483648u) {
+                            listener->OnInteger(INT_MIN);
+                        } else {
+                            listener->OnExtraInteger(temp, -1);
+                        }
 						state = STATE_TYPE;
 						break;
 					case 8:
-						// TODO: implement it
+						listener->OnExtraInteger(input->getLong(), -1);
 						break;
 				}
 			} else break;
@@ -307,10 +326,8 @@ void CborReader::Run() {
 						state = STATE_BYTES_DATA;
 						break;
 					case 8:
-						input->getLong();
-						currentLength = 123;
-						state = STATE_BYTES_DATA;
-						// TODO: implement it
+                        state = STATE_ERROR;
+                        listener->OnError("extra long bytes");
 						break;
 				}
 			} else break;
@@ -337,11 +354,9 @@ void CborReader::Run() {
 						state = STATE_STRING_DATA;
 						break;
 					case 8:
-						input->getLong();
-						currentLength = 123;
-						state = STATE_STRING_DATA;
-						// TODO: implement it
-						break;
+                        state = STATE_ERROR;
+                        listener->OnError("extra long array");
+                        break;
 				}
 			} else break;
 		} else if(state == STATE_STRING_DATA) {
@@ -367,11 +382,9 @@ void CborReader::Run() {
 						listener->OnArray(input->getInt());
 						state = STATE_TYPE;
 						break;
-					case 8:
-						//input->getLong();
-						//currentLength = 123;
-						state = STATE_TYPE;
-						// TODO: implement it
+                    case 8:
+                        state = STATE_ERROR;
+                        listener->OnError("extra long array");
 						break;
 				}
 			} else break;
@@ -391,10 +404,8 @@ void CborReader::Run() {
 						state = STATE_TYPE;
 						break;
 					case 8:
-						//input->getLong();
-						//currentLength = 123;
-						state = STATE_TYPE;
-						// TODO: implement it
+                        state = STATE_ERROR;
+                        listener->OnError("extra long map");
 						break;
 				}
 			} else break;
@@ -414,35 +425,34 @@ void CborReader::Run() {
 						state = STATE_TYPE;
 						break;
 					case 8:
-						input->getLong();
+						listener->OnExtraTag(input->getLong());
 						state = STATE_TYPE;
-						// TODO: implement it
 						break;
 				}
 			} else break;
 		} else if(state == STATE_SPECIAL) {
-			if(input->hasBytes(currentLength)) {
-				switch(currentLength) {
-					case 1:
-						listener->OnSpecial(input->getByte());
-						state = STATE_TYPE;
-						break;
-					case 2:
-						listener->OnSpecial(input->getShort());
-						state = STATE_TYPE;
-						break;
-					case 4:
-						// TODO: for integers > 2^31
-						listener->OnSpecial(input->getInt());
-						state = STATE_TYPE;
-						break;
-					case 8:
-						input->getLong();
-						state = STATE_TYPE;
-						// TODO: implement it
-						break;
-				}
-			} else break;
+            if (input->hasBytes(currentLength)) {
+                switch (currentLength) {
+                    case 1:
+                        listener->OnSpecial(input->getByte());
+                        state = STATE_TYPE;
+                        break;
+                    case 2:
+                        listener->OnSpecial(input->getShort());
+                        state = STATE_TYPE;
+                        break;
+                    case 4:
+                        listener->OnSpecial(input->getInt());
+                        state = STATE_TYPE;
+                        break;
+                    case 8:
+                        listener->OnExtraSpecial(input->getLong());
+                        state = STATE_TYPE;
+                        break;
+                }
+            } else break;
+        } else if(state == STATE_ERROR) {
+            break;
 		} else {
 			logger("UNKNOWN STATE");
 		}
@@ -672,7 +682,7 @@ void CborDebugListener::OnTag(unsigned int tag) {
 	printf("tag: %d\n", tag);
 }
 
-void CborDebugListener::OnSpecial(int code) {
+void CborDebugListener::OnSpecial(unsigned int code) {
 	printf("special: %d\n", code);
 }
 
@@ -680,3 +690,18 @@ void CborDebugListener::OnError(const char *error) {
 	printf("error: %s\n", error);
 }
 
+void CborDebugListener::OnExtraInteger(unsigned long long value, int sign) {
+    if(sign >= 0) {
+        printf("extra integer: %llu\n", value);
+    } else {
+        printf("extra integer: -%llu\n", value);
+    }
+}
+
+void CborDebugListener::OnExtraTag(unsigned long long tag) {
+    printf("extra tag: %llu\n", tag);
+}
+
+void CborDebugListener::OnExtraSpecial(unsigned long long tag) {
+    printf("extra special: %llu\n", tag);
+}
