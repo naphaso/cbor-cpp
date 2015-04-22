@@ -22,42 +22,50 @@
 using namespace cbor;
 
 input::input(void *data, int size) {
-    this->data = (unsigned char *)data;
-    this->size = size;
-    this->offset = 0;
+    _data = (unsigned char *)data;
+    _size = size;
+    _offset = 0;
 }
 
 input::~input() {
 
 }
 
-bool input::hasBytes(int count) {
-    return size - offset >= count;
+bool input::has_bytes(int count) {
+    return _size - _offset >= count;
 }
 
-unsigned char input::getByte() {
-    return data[offset++];
+unsigned char input::get_byte() {
+    return _data[_offset++];
 }
 
-unsigned short input::getShort() {
-    unsigned short value = ((unsigned short)data[offset] << 8) | ((unsigned short)data[offset + 1]);
-    offset += 2;
+unsigned short input::get_short() {
+    unsigned short value = ((unsigned short) _data[_offset] << 8) | ((unsigned short) _data[_offset + 1]);
+    _offset += 2;
     return value;
 }
 
-unsigned int input::getInt() {
-    unsigned int value = ((unsigned int)data[offset] << 24) | ((unsigned int)data[offset + 1] << 16) | ((unsigned int)data[offset + 2] << 8) | ((unsigned int)data[offset + 3]);
-    offset += 4;
+unsigned int input::get_int() {
+    unsigned int value = \
+            ((unsigned int) _data[_offset    ] << 24) |
+            ((unsigned int) _data[_offset + 1] << 16) |
+            ((unsigned int) _data[_offset + 2] << 8 ) |
+            ((unsigned int) _data[_offset + 3]);
+    _offset += 4;
     return value;
 }
 
-unsigned long long input::getLong() {
-    unsigned long long value = ((unsigned long long)data[offset] << 56) | ((unsigned long long)data[offset+1] << 48) | ((unsigned long long)data[offset+2] << 40) | ((unsigned long long)data[offset+3] << 32) | ((unsigned long long)data[offset+4] << 24) | ((unsigned long long)data[offset+5] << 16) | ((unsigned long long)data[offset+6] << 8) | ((unsigned long long)data[offset+7]);
-    offset += 8;
+unsigned long long input::get_long() {
+    unsigned long long value = ((unsigned long long) _data[_offset] << 56) |
+            ((unsigned long long) _data[_offset +1] << 48) | ((unsigned long long) _data[_offset +2] << 40) |
+            ((unsigned long long) _data[_offset +3] << 32) | ((unsigned long long) _data[_offset +4] << 24) |
+            ((unsigned long long) _data[_offset +5] << 16) | ((unsigned long long) _data[_offset +6] << 8 ) |
+            ((unsigned long long) _data[_offset +7]);
+    _offset += 8;
     return value;
 }
 
-void input::getBytes(void *to, int count) {
-    memcpy(to, data + offset, count);
-    offset += count;
+void input::get_bytes(void *to, int count) {
+    memcpy(to, _data + _offset, count);
+    _offset += count;
 }

@@ -40,12 +40,12 @@ void decoder::set_listener(listener &listener_instance) {
     _listener = &listener_instance;
 }
 
-void decoder::Run() {
+void decoder::run() {
     unsigned int temp;
     while(1) {
         if(_state == STATE_TYPE) {
-            if(_in->hasBytes(1)) {
-                unsigned char type = _in->getByte();
+            if(_in->has_bytes(1)) {
+                unsigned char type = _in->get_byte();
                 unsigned char majorType = type >> 5;
                 unsigned char minorType = (unsigned char) (type & 31);
 
@@ -215,18 +215,18 @@ void decoder::Run() {
                 }
             } else break;
         } else if(_state == STATE_PINT) {
-            if(_in->hasBytes(_currentLength)) {
+            if(_in->has_bytes(_currentLength)) {
                 switch(_currentLength) {
                     case 1:
-                        _listener->on_integer(_in->getByte());
+                        _listener->on_integer(_in->get_byte());
                         _state = STATE_TYPE;
                         break;
                     case 2:
-                        _listener->on_integer(_in->getShort());
+                        _listener->on_integer(_in->get_short());
                         _state = STATE_TYPE;
                         break;
                     case 4:
-                        temp = _in->getInt();
+                        temp = _in->get_int();
                         if(temp <= INT_MAX) {
                             _listener->on_integer(temp);
                         } else {
@@ -235,24 +235,24 @@ void decoder::Run() {
                         _state = STATE_TYPE;
                         break;
                     case 8:
-                        _listener->on_extra_integer(_in->getLong(), 1);
+                        _listener->on_extra_integer(_in->get_long(), 1);
                         _state = STATE_TYPE;
                         break;
                 }
             } else break;
         } else if(_state == STATE_NINT) {
-            if(_in->hasBytes(_currentLength)) {
+            if(_in->has_bytes(_currentLength)) {
                 switch(_currentLength) {
                     case 1:
-                        _listener->on_integer(-(int) _in->getByte());
+                        _listener->on_integer(-(int) _in->get_byte());
                         _state = STATE_TYPE;
                         break;
                     case 2:
-                        _listener->on_integer(-(int) _in->getShort());
+                        _listener->on_integer(-(int) _in->get_short());
                         _state = STATE_TYPE;
                         break;
                     case 4:
-                        temp = _in->getInt();
+                        temp = _in->get_int();
                         if(temp <= INT_MAX) {
                             _listener->on_integer(-(int) temp);
                         } else if(temp == 2147483648u) {
@@ -263,23 +263,23 @@ void decoder::Run() {
                         _state = STATE_TYPE;
                         break;
                     case 8:
-                        _listener->on_extra_integer(_in->getLong(), -1);
+                        _listener->on_extra_integer(_in->get_long(), -1);
                         break;
                 }
             } else break;
         } else if(_state == STATE_BYTES_SIZE) {
-            if(_in->hasBytes(_currentLength)) {
+            if(_in->has_bytes(_currentLength)) {
                 switch(_currentLength) {
                     case 1:
-                        _currentLength = _in->getByte();
+                        _currentLength = _in->get_byte();
                         _state = STATE_BYTES_DATA;
                         break;
                     case 2:
-                        _currentLength = _in->getShort();
+                        _currentLength = _in->get_short();
                         _state = STATE_BYTES_DATA;
                         break;
                     case 4:
-                        _currentLength = _in->getInt();
+                        _currentLength = _in->get_int();
                         _state = STATE_BYTES_DATA;
                         break;
                     case 8:
@@ -289,25 +289,25 @@ void decoder::Run() {
                 }
             } else break;
         } else if(_state == STATE_BYTES_DATA) {
-            if(_in->hasBytes(_currentLength)) {
+            if(_in->has_bytes(_currentLength)) {
                 unsigned char *data = new unsigned char[_currentLength];
-                _in->getBytes(data, _currentLength);
+                _in->get_bytes(data, _currentLength);
                 _state = STATE_TYPE;
                 _listener->on_bytes(data, _currentLength);
             } else break;
         } else if(_state == STATE_STRING_SIZE) {
-            if(_in->hasBytes(_currentLength)) {
+            if(_in->has_bytes(_currentLength)) {
                 switch(_currentLength) {
                     case 1:
-                        _currentLength = _in->getByte();
+                        _currentLength = _in->get_byte();
                         _state = STATE_STRING_DATA;
                         break;
                     case 2:
-                        _currentLength = _in->getShort();
+                        _currentLength = _in->get_short();
                         _state = STATE_STRING_DATA;
                         break;
                     case 4:
-                        _currentLength = _in->getInt();
+                        _currentLength = _in->get_int();
                         _state = STATE_STRING_DATA;
                         break;
                     case 8:
@@ -317,26 +317,26 @@ void decoder::Run() {
                 }
             } else break;
         } else if(_state == STATE_STRING_DATA) {
-            if(_in->hasBytes(_currentLength)) {
+            if(_in->has_bytes(_currentLength)) {
                 unsigned char *data = new unsigned char[_currentLength];
-                _in->getBytes(data, _currentLength);
+                _in->get_bytes(data, _currentLength);
                 _state = STATE_TYPE;
                 std::string str((const char *)data, (size_t)_currentLength);
                 _listener->on_string(str);
             } else break;
         } else if(_state == STATE_ARRAY) {
-            if(_in->hasBytes(_currentLength)) {
+            if(_in->has_bytes(_currentLength)) {
                 switch(_currentLength) {
                     case 1:
-                        _listener->on_array(_in->getByte());
+                        _listener->on_array(_in->get_byte());
                         _state = STATE_TYPE;
                         break;
                     case 2:
-                        _listener->on_array(_currentLength = _in->getShort());
+                        _listener->on_array(_currentLength = _in->get_short());
                         _state = STATE_TYPE;
                         break;
                     case 4:
-                        _listener->on_array(_in->getInt());
+                        _listener->on_array(_in->get_int());
                         _state = STATE_TYPE;
                         break;
                     case 8:
@@ -346,18 +346,18 @@ void decoder::Run() {
                 }
             } else break;
         } else if(_state == STATE_MAP) {
-            if(_in->hasBytes(_currentLength)) {
+            if(_in->has_bytes(_currentLength)) {
                 switch(_currentLength) {
                     case 1:
-                        _listener->on_map(_in->getByte());
+                        _listener->on_map(_in->get_byte());
                         _state = STATE_TYPE;
                         break;
                     case 2:
-                        _listener->on_map(_currentLength = _in->getShort());
+                        _listener->on_map(_currentLength = _in->get_short());
                         _state = STATE_TYPE;
                         break;
                     case 4:
-                        _listener->on_map(_in->getInt());
+                        _listener->on_map(_in->get_int());
                         _state = STATE_TYPE;
                         break;
                     case 8:
@@ -367,43 +367,43 @@ void decoder::Run() {
                 }
             } else break;
         } else if(_state == STATE_TAG) {
-            if(_in->hasBytes(_currentLength)) {
+            if(_in->has_bytes(_currentLength)) {
                 switch(_currentLength) {
                     case 1:
-                        _listener->on_tag(_in->getByte());
+                        _listener->on_tag(_in->get_byte());
                         _state = STATE_TYPE;
                         break;
                     case 2:
-                        _listener->on_tag(_in->getShort());
+                        _listener->on_tag(_in->get_short());
                         _state = STATE_TYPE;
                         break;
                     case 4:
-                        _listener->on_tag(_in->getInt());
+                        _listener->on_tag(_in->get_int());
                         _state = STATE_TYPE;
                         break;
                     case 8:
-                        _listener->on_extra_tag(_in->getLong());
+                        _listener->on_extra_tag(_in->get_long());
                         _state = STATE_TYPE;
                         break;
                 }
             } else break;
         } else if(_state == STATE_SPECIAL) {
-            if (_in->hasBytes(_currentLength)) {
+            if (_in->has_bytes(_currentLength)) {
                 switch (_currentLength) {
                     case 1:
-                        _listener->on_special(_in->getByte());
+                        _listener->on_special(_in->get_byte());
                         _state = STATE_TYPE;
                         break;
                     case 2:
-                        _listener->on_special(_in->getShort());
+                        _listener->on_special(_in->get_short());
                         _state = STATE_TYPE;
                         break;
                     case 4:
-                        _listener->on_special(_in->getInt());
+                        _listener->on_special(_in->get_int());
                         _state = STATE_TYPE;
                         break;
                     case 8:
-                        _listener->on_extra_special(_in->getLong());
+                        _listener->on_extra_special(_in->get_long());
                         _state = STATE_TYPE;
                         break;
                 }

@@ -21,6 +21,10 @@
 
 namespace cbor {
     class output_static : public output {
+    private:
+        unsigned char *_buffer;
+        unsigned int _capacity;
+        unsigned int _offset;
     public:
         output_static(unsigned int capacity);
 
@@ -30,14 +34,9 @@ namespace cbor {
 
         virtual unsigned int getSize();
 
-        virtual void putByte(unsigned char value);
+        virtual void put_byte(unsigned char value);
 
-        virtual void putBytes(const unsigned char *data, int size);
-
-    private:
-        unsigned char *buffer;
-        unsigned int capacity;
-        unsigned int offset;
+        virtual void put_bytes(const unsigned char *data, int size);
     };
 }
 

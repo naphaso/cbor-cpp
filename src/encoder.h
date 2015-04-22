@@ -30,32 +30,32 @@ namespace cbor {
 
         ~encoder();
 
-        void writeInt(int value);
+        void write_int(int value);
 
-        void writeInt(long long value);
+        void write_int(long long value);
 
-        void writeInt(unsigned int value);
+        void write_int(unsigned int value);
 
-        void writeInt(unsigned long long value);
+        void write_int(unsigned long long value);
 
-        void writeBytes(const unsigned char *data, unsigned int size);
+        void write_bytes(const unsigned char *data, unsigned int size);
 
-        void writeString(const char *data, unsigned int size);
+        void write_string(const char *data, unsigned int size);
 
-        void writeString(const std::string str);
+        void write_string(const std::string str);
 
-        void writeArray(int size);
+        void write_array(int size);
 
-        void writeMap(int size);
+        void write_map(int size);
 
-        void writeTag(const unsigned int tag);
+        void write_tag(const unsigned int tag);
 
-        void writeSpecial(int special);
+        void write_special(int special);
 
     private:
-        void writeTypeAndValue(int majorType, unsigned int value);
+        void write_type_value(int major_type, unsigned int value);
 
-        void writeTypeAndValue(int majorType, unsigned long long value);
+        void write_type_value(int major_type, unsigned long long value);
     };
 }
 

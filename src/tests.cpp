@@ -23,13 +23,13 @@ int main() {
 
     { //encoding
         cbor::encoder encoder(output);
-        encoder.writeArray(5);
+        encoder.write_array(5);
         {
-            encoder.writeInt(123);
-            encoder.writeString("bar");
-            encoder.writeInt(321);
-            encoder.writeInt(321);
-            encoder.writeString("foo");
+            encoder.write_int(123);
+            encoder.write_string("bar");
+            encoder.write_int(321);
+            encoder.write_int(321);
+            encoder.write_string("foo");
         }
     }
 
@@ -37,7 +37,7 @@ int main() {
         cbor::input input(output.data(), output.size());
         cbor::listener_debug listener;
         cbor::decoder decoder(input, listener);
-        decoder.Run();
+        decoder.run();
     }
 
     return 0;

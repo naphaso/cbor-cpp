@@ -25,9 +25,9 @@ namespace cbor {
 
         virtual unsigned int size() = 0;
 
-        virtual void putByte(unsigned char value) = 0;
+        virtual void put_byte(unsigned char value) = 0;
 
-        virtual void putBytes(const unsigned char *data, int size) = 0;
+        virtual void put_bytes(const unsigned char *data, int size) = 0;
     };
 }
 

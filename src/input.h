@@ -19,27 +19,26 @@
 
 namespace cbor {
     class input {
+    private:
+        unsigned char *_data;
+        int _size;
+        int _offset;
     public:
         input(void *data, int size);
 
         ~input();
 
-        bool hasBytes(int count);
+        bool has_bytes(int count);
 
-        unsigned char getByte();
+        unsigned char get_byte();
 
-        unsigned short getShort();
+        unsigned short get_short();
 
-        unsigned int getInt();
+        unsigned int get_int();
 
-        unsigned long long getLong();
+        unsigned long long get_long();
 
-        void getBytes(void *to, int count);
-
-    private:
-        unsigned char *data;
-        int size;
-        int offset;
+        void get_bytes(void *to, int count);
     };
 }
 

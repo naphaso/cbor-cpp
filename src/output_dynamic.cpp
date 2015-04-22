@@ -23,9 +23,9 @@ using namespace cbor;
 
 
 void output_dynamic::init(unsigned int initalCapacity) {
-    this->capacity = initalCapacity;
-    this->buffer = new unsigned char[initalCapacity];
-    this->offset = 0;
+    this->_capacity = initalCapacity;
+    this->_buffer = new unsigned char[initalCapacity];
+    this->_offset = 0;
 }
 
 output_dynamic::output_dynamic() {
@@ -37,33 +37,33 @@ output_dynamic::output_dynamic(unsigned int inital_capacity) {
 }
 
 output_dynamic::~output_dynamic() {
-    delete buffer;
+    delete _buffer;
 }
 
 unsigned char *output_dynamic::data() {
-    return buffer;
+    return _buffer;
 }
 
 unsigned int output_dynamic::size() {
-    return offset;
+    return _offset;
 }
 
-void output_dynamic::putByte(unsigned char value) {
-    if(offset < capacity) {
-        buffer[offset++] = value;
+void output_dynamic::put_byte(unsigned char value) {
+    if(_offset < _capacity) {
+        _buffer[_offset++] = value;
     } else {
-        capacity *= 2;
-        buffer = (unsigned char *) realloc(buffer, capacity);
-        buffer[offset++] = value;
+        _capacity *= 2;
+        _buffer = (unsigned char *) realloc(_buffer, _capacity);
+        _buffer[_offset++] = value;
     }
 }
 
-void output_dynamic::putBytes(const unsigned char *data, int size) {
-    while(offset + size > capacity) {
-        capacity *= 2;
-        buffer = (unsigned char *) realloc(buffer, capacity);
+void output_dynamic::put_bytes(const unsigned char *data, int size) {
+    while(_offset + size > _capacity) {
+        _capacity *= 2;
+        _buffer = (unsigned char *) realloc(_buffer, _capacity);
     }
 
-    memcpy(buffer + offset, data, size);
-    offset += size;
+    memcpy(_buffer + _offset, data, size);
+    _offset += size;
 }

@@ -47,7 +47,7 @@ namespace cbor {
         decoder(input &in);
         decoder(input &in, listener &listener);
         ~decoder();
-        void Run();
+        void run();
         void set_listener(listener &listener_instance);
     };
 }

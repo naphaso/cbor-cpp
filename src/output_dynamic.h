@@ -22,6 +22,10 @@
 
 namespace cbor {
     class output_dynamic : public output {
+    private:
+        unsigned char *_buffer;
+        unsigned int _capacity;
+        unsigned int _offset;
     public:
         output_dynamic();
 
@@ -33,16 +37,12 @@ namespace cbor {
 
         virtual unsigned int size();
 
-        virtual void putByte(unsigned char value);
+        virtual void put_byte(unsigned char value);
 
-        virtual void putBytes(const unsigned char *data, int size);
+        virtual void put_bytes(const unsigned char *data, int size);
 
     private:
         void init(unsigned int initalCapacity);
-
-        unsigned char *buffer;
-        unsigned int capacity;
-        unsigned int offset;
     };
 }
 
