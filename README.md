@@ -21,8 +21,8 @@ Writing:
   writer.writeString("world");
   writer.writeInt(321);
 
-  unsigned char *data = output.getData();
-  int size = output.getSize();
+  unsigned char *data = output.data();
+  int size = output.size();
 ```
 
 Reading:
