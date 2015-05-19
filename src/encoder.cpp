@@ -139,3 +139,11 @@ void encoder::write_bool(bool value) {
         _out->put_byte((unsigned char) 0xf4);
     }
 }
+
+void encoder::write_null() {
+    _out->put_byte((unsigned char) 0xf6);
+}
+
+void encoder::write_undefined() {
+    _out->put_byte((unsigned char) 0xf7);
+}
