@@ -35,6 +35,12 @@ namespace cbor {
         virtual void on_tag(unsigned int tag) = 0;
 
         virtual void on_special(unsigned int code) = 0;
+        
+        virtual void on_bool(bool) = 0;
+        
+        virtual void on_null() = 0;
+        
+        virtual void on_undefined() = 0;
 
         virtual void on_error(const char *error) = 0;
 

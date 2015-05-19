@@ -193,8 +193,16 @@ void decoder::run() {
                         }
                         break;
                     case 7: // special
-                        if(minorType < 24) {
+                        if (minorType < 20) {
                             _listener->on_special(minorType);
+                        } else if (minorType == 20) {
+                            _listener->on_bool(false);
+                        } else if (minorType == 21) {
+                            _listener->on_bool(true);
+                        } else if (minorType == 22) {
+                            _listener->on_null();
+                        } else if (minorType == 23) {
+                            _listener->on_undefined();
                         } else if(minorType == 24) {
                             _state = STATE_SPECIAL;
                             _currentLength = 1;
