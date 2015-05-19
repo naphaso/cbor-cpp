@@ -30,6 +30,8 @@ namespace cbor {
 
         ~encoder();
 
+        void write_bool(bool value);
+        
         void write_int(int value);
 
         void write_int(long long value);

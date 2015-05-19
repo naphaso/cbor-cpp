@@ -132,3 +132,10 @@ void encoder::write_special(int special) {
     write_type_value(7, (unsigned int) special);
 }
 
+void encoder::write_bool(bool value) {
+    if (value == true) {
+        _out->put_byte((unsigned char) 0xf5);
+    } else {
+        _out->put_byte((unsigned char) 0xf4);
+    }
+}
