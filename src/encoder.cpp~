@@ -94,7 +94,7 @@ void encoder::write_int(long long value) {
 
 void encoder::write_int(int value) {
     if(value < 0) {
-        write_type_value(1, (unsigned int) -(value+1));
+        write_type_value(1, (unsigned int) -(alue+1));
     } else {
         write_type_value(0, (unsigned int) value);
     }
