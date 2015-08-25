@@ -72,7 +72,7 @@ void decoder::run() {
                         break;
                     case 1: // negative integer
                         if(minorType < 24) {
-                            _listener->on_integer(-minorType);
+                            _listener->on_integer(-1 -minorType);
                         } else if(minorType == 24) { // 1 byte
                             _currentLength = 1;
                             _state = STATE_NINT;
