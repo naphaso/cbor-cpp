@@ -30,6 +30,8 @@ namespace cbor {
 
         ~encoder();
 
+        void write_bool(bool value);
+        
         void write_int(int value);
 
         void write_int(long long value);
@@ -51,6 +53,10 @@ namespace cbor {
         void write_tag(const unsigned int tag);
 
         void write_special(int special);
+        
+        void write_null();
+        
+        void write_undefined();
 
     private:
         void write_type_value(int major_type, unsigned int value);

@@ -46,6 +46,18 @@ void listener_debug::on_special(unsigned int code) {
     printf("special: %d\n", code);
 }
 
+void listener_debug::on_bool(bool value) {
+    printf("bool: %s\n", value ? "true" : "false");
+}
+
+void listener_debug::on_null() {
+    printf("special: null\n");
+}
+
+void listener_debug::on_undefined() {
+    printf("special: undefined\n");
+}
+
 void listener_debug::on_error(const char *error) {
     printf("error: %s\n", error);
 }

@@ -23,13 +23,17 @@ int main() {
 
     { //encoding
         cbor::encoder encoder(output);
-        encoder.write_array(5);
+        encoder.write_array(9);
         {
             encoder.write_int(123);
             encoder.write_string("bar");
             encoder.write_int(321);
             encoder.write_int(321);
             encoder.write_string("foo");
+            encoder.write_bool(true);
+            encoder.write_bool(false);
+            encoder.write_null();
+            encoder.write_undefined();
         }
     }
 
