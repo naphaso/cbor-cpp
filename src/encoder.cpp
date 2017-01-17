@@ -57,6 +57,7 @@ void encoder::write_type_value(int major_type, unsigned long long value) {
     } else if(value < 65536ULL) {
         _out->put_byte((unsigned char) (major_type | 25));
         _out->put_byte((unsigned char) (value >> 8));
+        _out->put_byte((unsigned char) value);
     } else if(value < 4294967296ULL) {
         _out->put_byte((unsigned char) (major_type | 26));
         _out->put_byte((unsigned char) (value >> 24));
