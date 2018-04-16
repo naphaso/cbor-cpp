@@ -252,26 +252,24 @@ void decoder::run() {
             if(_in->has_bytes(_currentLength)) {
                 switch(_currentLength) {
                     case 1:
-                        _listener->on_integer(-(int) _in->get_byte());
+                        _listener->on_integer(-(int) _in->get_byte() - 1);
                         _state = STATE_TYPE;
                         break;
                     case 2:
-                        _listener->on_integer(-(int) _in->get_short());
+                        _listener->on_integer(-(int) _in->get_short() - 1);
                         _state = STATE_TYPE;
                         break;
                     case 4:
                         temp = _in->get_int();
                         if(temp <= INT_MAX) {
-                            _listener->on_integer(-(int) temp);
-                        } else if(temp == 2147483648u) {
-                            _listener->on_integer(INT_MIN);
+                            _listener->on_integer(-(int) temp - 1);
                         } else {
-                            _listener->on_extra_integer(temp, -1);
+                            _listener->on_extra_integer(temp + 1, -1);
                         }
                         _state = STATE_TYPE;
                         break;
                     case 8:
-                        _listener->on_extra_integer(_in->get_long(), -1);
+                        _listener->on_extra_integer(_in->get_long() + 1, -1);
                         break;
                 }
             } else break;
