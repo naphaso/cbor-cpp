@@ -8,9 +8,9 @@ set(SOURCE_FILES
     src/encoder.cpp
     src/decoder.cpp
     src/input.cpp
-    src/listener_debug.cpp
     src/output_dynamic.cpp
     src/output_static.cpp
+	src/cbor_object.cpp
     )
 
 set(TEST_SOURCE_FILES
