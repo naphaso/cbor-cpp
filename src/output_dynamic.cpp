@@ -18,6 +18,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <boost/algorithm/hex.hpp>
 
 using namespace cbor;
 
@@ -46,6 +47,18 @@ unsigned char *output_dynamic::data() {
 
 unsigned int output_dynamic::size() {
     return _offset;
+}
+
+std::vector<unsigned char> output_dynamic::bytes() {
+	std::vector<unsigned char> result(size());
+	memcpy(result.data(), data(), size());
+	return result;
+}
+std::string output_dynamic::hex() {
+	const auto& data_bytes = bytes();
+	std::string res;
+	boost::algorithm::hex(data_bytes.begin(), data_bytes.end(), std::back_inserter(res));
+	return res;
 }
 
 void output_dynamic::put_byte(unsigned char value) {

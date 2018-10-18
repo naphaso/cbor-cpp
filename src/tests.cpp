@@ -55,6 +55,7 @@ int main() {
     }
 
     { // decoding
+		auto output_hex = output.hex();
         cbor::input input(output.data(), output.size());
         cbor::decoder decoder(input);
         auto result = decoder.run();
