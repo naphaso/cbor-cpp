@@ -20,9 +20,7 @@
 #include "input.h"
 #include "encoder.h"
 #include "decoder.h"
-#include "listener.h"
 #include "output_static.h"
 #include "output_dynamic.h"
-#include "listener_debug.h"
 
 #endif //CBOR_CPP_CBOR_H

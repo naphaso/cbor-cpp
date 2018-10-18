@@ -2,3 +2,15 @@
 *.xcodeproj/
 *.dSYM
 test
+/.vs
+/.vscode
+/*.sln
+/*.vcxproj
+/*.vcxproj.filters
+/*.vcxproj.user
+*~
+/build
+/bin
+/Debug
+/Release
+/x64

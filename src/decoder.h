@@ -15,11 +15,10 @@
 */
 
 
-#ifndef __CborDecoder_H_
-#define __CborDecoder_H_
+#pragma once
 
-#include "listener.h"
 #include "input.h"
+#include "cbor_object.h"
 
 namespace cbor {
     typedef enum {
@@ -39,18 +38,14 @@ namespace cbor {
 
     class decoder {
     private:
-        listener *_listener;
+        // listener *_listener;
         input *_in;
         decoder_state _state;
         int _currentLength;
     public:
         decoder(input &in);
-        decoder(input &in, listener &listener);
         ~decoder();
-        void run();
-        void set_listener(listener &listener_instance);
+		CborObjectP run();
+        //void set_listener(listener &listener_instance);
     };
 }
-
-
-#endif //__CborDecoder_H_
