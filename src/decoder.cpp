@@ -377,10 +377,10 @@ CborObjectP decoder::run() {
             } else break;
         } else if(_state == STATE_STRING_DATA) {
             if(_in->has_bytes(_currentLength)) {
-                unsigned char *data = new unsigned char[_currentLength];
-                _in->get_bytes(data, _currentLength);
+				std::vector<char> data(_currentLength);
+                _in->get_bytes(data.data(), _currentLength);
                 _state = STATE_TYPE;
-                std::string str((const char *)data, (size_t)_currentLength);
+                std::string str(data.data(), (size_t)_currentLength);
 				put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_string(str));
             } else break;
         } else if(_state == STATE_ARRAY) {
