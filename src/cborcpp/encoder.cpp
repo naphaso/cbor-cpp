@@ -28,7 +28,7 @@ encoder::~encoder() {
 
 }
 
-void encoder::write_type_value(int major_type, unsigned int value) {
+void encoder::write_type_value(int major_type, uint32_t value) {
     major_type <<= 5;
     if(value < 24) {
         _out->put_byte((unsigned char) (major_type | value));
@@ -48,7 +48,7 @@ void encoder::write_type_value(int major_type, unsigned int value) {
     }
 }
 
-void encoder::write_type_value(int major_type, unsigned long long value) {
+void encoder::write_type_value(int major_type, uint64_t value) {
     major_type <<= 5;
     if(value < 24ULL) {
         _out->put_byte((unsigned char) (major_type | value));
@@ -78,27 +78,27 @@ void encoder::write_type_value(int major_type, unsigned long long value) {
     }
 }
 
-void encoder::write_int(unsigned int value) {
+void encoder::write_int(uint32_t value) {
     write_type_value(0, value);
 }
 
-void encoder::write_int(unsigned long long value) {
+void encoder::write_int(uint64_t value) {
     write_type_value(0, value);
 }
 
-void encoder::write_int(long long value) {
+void encoder::write_int(int64_t value) {
     if(value < 0) {
-        write_type_value(1, (unsigned long long) -(value+1));
+        write_type_value(1, (uint64_t) -(value+1));
     } else {
-        write_type_value(0, (unsigned long long) value);
+        write_type_value(0, (uint64_t) value);
     }
 }
 
-void encoder::write_int(int value) {
+void encoder::write_int(int32_t value) {
     if(value < 0) {
-        write_type_value(1, (unsigned int) -(value+1));
+        write_type_value(1, (uint32_t) -(value+1));
     } else {
-        write_type_value(0, (unsigned int) value);
+        write_type_value(0, (uint32_t) value);
     }
 }
 

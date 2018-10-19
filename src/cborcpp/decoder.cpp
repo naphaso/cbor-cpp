@@ -52,7 +52,7 @@ static void put_decoded_value(CborObjectP& result, std::vector<CborObjectP>& str
 	}
 	auto last = structures_stack[old_structures_stack_size - 1];
 	if (last->type == COT_ARRAY) {
-		auto& array_value = boost::get<CborArrayValue&>(last->value);
+		auto& array_value = boost::get<CborArrayValue>(last->value);
 		array_value.push_back(value);
 		if (array_value.size() >= last->array_or_map_size) {
 			// full, pop from structure
@@ -67,7 +67,7 @@ static void put_decoded_value(CborObjectP& result, std::vector<CborObjectP>& str
 				throw cbor_decode_exception("invalid map key type");
 			}
 			const auto& key = boost::get<CborStringValue>(map_key_temp->value);
-			auto& map_value = boost::get<CborMapValue&>(last->value);
+			auto& map_value = boost::get<CborMapValue>(last->value);
 			map_value[key] = value;
 			if (map_value.size() >= last->array_or_map_size) {
 				// full, pop from structure

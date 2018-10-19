@@ -12,13 +12,19 @@ set(SOURCE_FILES
     src/cborcpp/input.cpp
     src/cborcpp/output_dynamic.cpp
     src/cborcpp/output_static.cpp
-	src/cborcpp/cbor_object.cpp
-	src/cborcpp/output.cpp
-    )
+    src/cborcpp/cbor_object.cpp
+    src/cborcpp/output.cpp
+)
 
 set(TEST_SOURCE_FILES
     src/tests.cpp
     )
+include_directories(include/)
 
-add_library(cborcpp SHARED ${SOURCE_FILES} ${HEADERS})
+add_library(cborcpp_dynamic SHARED ${SOURCE_FILES} ${HEADERS})
+add_library(cborcpp STATIC ${SOURCE_FILES} ${HEADERS})
 add_executable(testing ${SOURCE_FILES} ${HEADERS} ${TEST_SOURCE_FILES})
+
+target_include_directories( cborcpp 
+  PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)

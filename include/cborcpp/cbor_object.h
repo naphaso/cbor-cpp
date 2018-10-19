@@ -47,7 +47,7 @@ namespace cbor {
 
 		template <typename T>
 		const T& as() const {
-			return boost::get<const T&>(value);
+			return boost::get<T>(value);
 		}
 
 		inline bool is_null() const {
@@ -83,16 +83,16 @@ namespace cbor {
 		inline CborObjectType object_type() const {
 			return type;
 		}
-		inline CborBoolValue as_bool() const {
+		inline const CborBoolValue& as_bool() const {
 			return as<CborBoolValue>();
 		}
-		inline CborIntValue as_int() const {
+		inline const CborIntValue& as_int() const {
 			return as<CborIntValue>();
 		}
-		inline CborTagValue as_tag() const {
+		inline const CborTagValue& as_tag() const {
 			return as<CborTagValue>();
 		}
-		inline CborSpecialValue as_special() const {
+		inline const CborSpecialValue& as_special() const {
 			return as<CborSpecialValue>();
 		}
 		inline const CborBytesValue& as_bytes() const {
