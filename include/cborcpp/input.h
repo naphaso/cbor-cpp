@@ -14,21 +14,30 @@
 	   limitations under the License.
 */
 
-
-#ifndef __CborOutput_H_
-#define __CborOutput_H_
+#pragma once
 
 namespace cbor {
-    class output {
+    class input {
+    private:
+        unsigned char *_data;
+        int _size;
+        int _offset;
     public:
-        virtual unsigned char *data() = 0;
+        input(void *data, int size);
 
-        virtual unsigned int size() = 0;
+        ~input();
 
-        virtual void put_byte(unsigned char value) = 0;
+        bool has_bytes(int count);
 
-        virtual void put_bytes(const unsigned char *data, int size) = 0;
+        unsigned char get_byte();
+
+        unsigned short get_short();
+
+        unsigned int get_int();
+
+        unsigned long long get_long();
+
+        void get_bytes(void *to, int count);
     };
 }
 
-#endif //__CborOutput_H_

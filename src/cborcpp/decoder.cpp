@@ -14,8 +14,7 @@
 	   limitations under the License.
 */
 
-#include "decoder.h"
-#include "log.h"
+#include "cborcpp/decoder.h"
 
 #include <limits.h>
 
@@ -26,21 +25,74 @@ decoder::decoder(input &in) {
     _state = STATE_TYPE;
 }
 
-decoder::decoder(input &in, listener &listener) {
-    _in = &in;
-    _listener = &listener;
-    _state = STATE_TYPE;
-}
-
 decoder::~decoder() {
 
 }
 
-void decoder::set_listener(listener &listener_instance) {
-    _listener = &listener_instance;
+static CborObjectP cbor_object_error(const std::string& error_msg) {
+	auto result = std::make_shared<CborObject>();
+	result->type = CborObjectType::COT_ERROR;
+	result->value = error_msg;
+	return result;
 }
 
-void decoder::run() {
+static void put_decoded_value(CborObjectP& result, std::vector<CborObjectP>& structures_stack, bool& iter_in_map_key, CborObjectP& map_key_temp, CborObjectP value) {
+	auto old_structures_stack_size = structures_stack.size();
+	if (structures_stack.empty()) {
+		if (result)
+			throw cbor_decode_exception("multiple cbor object when decoding");
+		result = value;
+
+		if (value->type == COT_ARRAY || value->type == COT_MAP) {
+			if (value->array_or_map_size > 0) {
+				structures_stack.push_back(value);
+			}
+		}
+		return;
+	}
+	auto last = structures_stack[old_structures_stack_size - 1];
+	if (last->type == COT_ARRAY) {
+		auto& array_value = boost::get<CborArrayValue>(last->value);
+		array_value.push_back(value);
+		if (array_value.size() >= last->array_or_map_size) {
+			// full, pop from structure
+			structures_stack.pop_back();
+		}
+	}
+	else if (last->type == COT_MAP) {
+		if (iter_in_map_key)
+			map_key_temp = value;
+		else {
+			if (map_key_temp->type != COT_STRING) {
+				throw cbor_decode_exception("invalid map key type");
+			}
+			const auto& key = boost::get<CborStringValue>(map_key_temp->value);
+			auto& map_value = boost::get<CborMapValue>(last->value);
+			map_value[key] = value;
+			if (map_value.size() >= last->array_or_map_size) {
+				// full, pop from structure
+				structures_stack.pop_back();
+			}
+		}
+		iter_in_map_key = !iter_in_map_key;
+	}
+	else {
+		throw cbor_decode_exception("invalid structure type");
+	}
+
+	if (value->type == COT_ARRAY || value->type == COT_MAP) {
+		if (value->array_or_map_size > 0) {
+			structures_stack.push_back(value);
+		}
+	}
+}
+
+CborObjectP decoder::run() {
+	CborObjectP result;
+	std::vector<CborObjectP> structures_stack;
+	bool iter_in_map_key = true;
+	CborObjectP map_key_temp;
+	
     unsigned int temp;
     while(1) {
         if(_state == STATE_TYPE) {
@@ -52,7 +104,7 @@ void decoder::run() {
                 switch(majorType) {
                     case 0: // positive integer
                         if(minorType < 24) {
-                            _listener->on_integer(minorType);
+							put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_int(minorType));
                         } else if(minorType == 24) { // 1 byte
                             _currentLength = 1;
                             _state = STATE_PINT;
@@ -67,12 +119,12 @@ void decoder::run() {
                             _state = STATE_PINT;
                         } else {
                             _state = STATE_ERROR;
-                            _listener->on_error("invalid integer type");
+                            throw cbor_decode_exception("invalid integer type");
                         }
                         break;
                     case 1: // negative integer
                         if(minorType < 24) {
-                            _listener->on_integer(-1 -minorType);
+							put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_int(-1 - minorType));
                         } else if(minorType == 24) { // 1 byte
                             _currentLength = 1;
                             _state = STATE_NINT;
@@ -87,7 +139,7 @@ void decoder::run() {
                             _state = STATE_NINT;
                         } else {
                             _state = STATE_ERROR;
-                            _listener->on_error("invalid integer type");
+                            throw cbor_decode_exception("invalid integer type");
                         }
                         break;
                     case 2: // bytes
@@ -108,7 +160,7 @@ void decoder::run() {
                             _state = STATE_BYTES_SIZE;
                         } else {
                             _state = STATE_ERROR;
-                            _listener->on_error("invalid bytes type");
+							throw cbor_decode_exception("invalid bytes type");
                         }
                         break;
                     case 3: // string
@@ -129,12 +181,12 @@ void decoder::run() {
                             _state = STATE_STRING_SIZE;
                         } else {
                             _state = STATE_ERROR;
-                            _listener->on_error("invalid string type");
+							throw cbor_decode_exception("invalid string type");
                         }
                         break;
                     case 4: // array
                         if(minorType < 24) {
-                            _listener->on_array(minorType);
+							put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::create_array(minorType));
                         } else if(minorType == 24) {
                             _state = STATE_ARRAY;
                             _currentLength = 1;
@@ -149,12 +201,12 @@ void decoder::run() {
                             _state = STATE_ARRAY;
                         } else {
                             _state = STATE_ERROR;
-                            _listener->on_error("invalid array type");
+							throw cbor_decode_exception("invalid array type");
                         }
                         break;
                     case 5: // map
                         if(minorType < 24) {
-                            _listener->on_map(minorType);
+							put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::create_map(minorType));
                         } else if(minorType == 24) {
                             _state = STATE_MAP;
                             _currentLength = 1;
@@ -169,12 +221,12 @@ void decoder::run() {
                             _state = STATE_MAP;
                         } else {
                             _state = STATE_ERROR;
-                            _listener->on_error("invalid array type");
+							throw cbor_decode_exception("invalid array type");
                         }
                         break;
                     case 6: // tag
                         if(minorType < 24) {
-                            _listener->on_tag(minorType);
+							put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_tag(minorType));
                         } else if(minorType == 24) {
                             _state = STATE_TAG;
                             _currentLength = 1;
@@ -189,20 +241,20 @@ void decoder::run() {
                             _state = STATE_TAG;
                         } else {
                             _state = STATE_ERROR;
-                            _listener->on_error("invalid tag type");
+							throw cbor_decode_exception("invalid tag type");
                         }
                         break;
                     case 7: // special
                         if (minorType < 20) {
-                            _listener->on_special(minorType);
+							put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_special(minorType));
                         } else if (minorType == 20) {
-                            _listener->on_bool(false);
+							put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_bool(false));
                         } else if (minorType == 21) {
-                            _listener->on_bool(true);
+							put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_bool(true));
                         } else if (minorType == 22) {
-                            _listener->on_null();
+							put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::create_null());
                         } else if (minorType == 23) {
-                            _listener->on_undefined();
+							put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::create_undefined());
                         } else if(minorType == 24) {
                             _state = STATE_SPECIAL;
                             _currentLength = 1;
@@ -217,7 +269,7 @@ void decoder::run() {
                             _state = STATE_SPECIAL;
                         } else {
                             _state = STATE_ERROR;
-                            _listener->on_error("invalid special type");
+							throw cbor_decode_exception("invalid special type");
                         }
                         break;
                 }
@@ -226,24 +278,24 @@ void decoder::run() {
             if(_in->has_bytes(_currentLength)) {
                 switch(_currentLength) {
                     case 1:
-                        _listener->on_integer(_in->get_byte());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_int(_in->get_byte()));
                         _state = STATE_TYPE;
                         break;
                     case 2:
-                        _listener->on_integer(_in->get_short());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_int(_in->get_short()));
                         _state = STATE_TYPE;
                         break;
                     case 4:
                         temp = _in->get_int();
                         if(temp <= INT_MAX) {
-                            _listener->on_integer(temp);
+							put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_int(temp));
                         } else {
-                            _listener->on_extra_integer(temp, 1);
+							put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_extra_integer(temp, true));
                         }
                         _state = STATE_TYPE;
                         break;
                     case 8:
-                        _listener->on_extra_integer(_in->get_long(), 1);
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_extra_integer(_in->get_long(), true));
                         _state = STATE_TYPE;
                         break;
                 }
@@ -252,24 +304,24 @@ void decoder::run() {
             if(_in->has_bytes(_currentLength)) {
                 switch(_currentLength) {
                     case 1:
-                        _listener->on_integer(-(int) _in->get_byte() - 1);
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_int(-(int)_in->get_byte() - 1));
                         _state = STATE_TYPE;
                         break;
                     case 2:
-                        _listener->on_integer(-(int) _in->get_short() - 1);
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_int(-(int) _in->get_short() - 1));
                         _state = STATE_TYPE;
                         break;
                     case 4:
                         temp = _in->get_int();
                         if(temp <= INT_MAX) {
-                            _listener->on_integer(-(int) temp - 1);
+							put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_int(-(int) temp - 1));
                         } else {
-                            _listener->on_extra_integer(temp + 1, -1);
+							put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_extra_integer(temp + 1, false));
                         }
                         _state = STATE_TYPE;
                         break;
                     case 8:
-                        _listener->on_extra_integer(_in->get_long() + 1, -1);
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_extra_integer(_in->get_long() + 1, false));
                         break;
                 }
             } else break;
@@ -290,16 +342,16 @@ void decoder::run() {
                         break;
                     case 8:
                         _state = STATE_ERROR;
-                        _listener->on_error("extra long bytes");
+						throw cbor_decode_exception("extra long bytes");
                         break;
                 }
             } else break;
         } else if(_state == STATE_BYTES_DATA) {
             if(_in->has_bytes(_currentLength)) {
-                unsigned char *data = new unsigned char[_currentLength];
-                _in->get_bytes(data, _currentLength);
+				std::vector<char> data(_currentLength);
+                _in->get_bytes(data.data(), _currentLength);
                 _state = STATE_TYPE;
-                _listener->on_bytes(data, _currentLength);
+				put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_bytes(data));
             } else break;
         } else if(_state == STATE_STRING_SIZE) {
             if(_in->has_bytes(_currentLength)) {
@@ -318,36 +370,36 @@ void decoder::run() {
                         break;
                     case 8:
                         _state = STATE_ERROR;
-                        _listener->on_error("extra long array");
+						throw cbor_decode_exception("extra long array");
                         break;
                 }
             } else break;
         } else if(_state == STATE_STRING_DATA) {
             if(_in->has_bytes(_currentLength)) {
-                unsigned char *data = new unsigned char[_currentLength];
-                _in->get_bytes(data, _currentLength);
+				std::vector<char> data(_currentLength);
+                _in->get_bytes(data.data(), _currentLength);
                 _state = STATE_TYPE;
-                std::string str((const char *)data, (size_t)_currentLength);
-                _listener->on_string(str);
+                std::string str(data.data(), (size_t)_currentLength);
+				put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_string(str));
             } else break;
         } else if(_state == STATE_ARRAY) {
             if(_in->has_bytes(_currentLength)) {
                 switch(_currentLength) {
                     case 1:
-                        _listener->on_array(_in->get_byte());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::create_array(_in->get_byte()));
                         _state = STATE_TYPE;
                         break;
                     case 2:
-                        _listener->on_array(_currentLength = _in->get_short());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::create_array(_in->get_short()));
                         _state = STATE_TYPE;
                         break;
                     case 4:
-                        _listener->on_array(_in->get_int());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::create_array(_in->get_int()));
                         _state = STATE_TYPE;
                         break;
                     case 8:
                         _state = STATE_ERROR;
-                        _listener->on_error("extra long array");
+						throw cbor_decode_exception("extra long array");
                         break;
                 }
             } else break;
@@ -355,20 +407,20 @@ void decoder::run() {
             if(_in->has_bytes(_currentLength)) {
                 switch(_currentLength) {
                     case 1:
-                        _listener->on_map(_in->get_byte());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::create_map(_in->get_byte()));
                         _state = STATE_TYPE;
                         break;
                     case 2:
-                        _listener->on_map(_currentLength = _in->get_short());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::create_map(_currentLength = _in->get_short()));
                         _state = STATE_TYPE;
                         break;
                     case 4:
-                        _listener->on_map(_in->get_int());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::create_map(_in->get_int()));
                         _state = STATE_TYPE;
                         break;
                     case 8:
                         _state = STATE_ERROR;
-                        _listener->on_error("extra long map");
+						throw cbor_decode_exception("extra long map");
                         break;
                 }
             } else break;
@@ -376,19 +428,19 @@ void decoder::run() {
             if(_in->has_bytes(_currentLength)) {
                 switch(_currentLength) {
                     case 1:
-                        _listener->on_tag(_in->get_byte());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_tag(_in->get_byte()));
                         _state = STATE_TYPE;
                         break;
                     case 2:
-                        _listener->on_tag(_in->get_short());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_tag(_in->get_short()));
                         _state = STATE_TYPE;
                         break;
                     case 4:
-                        _listener->on_tag(_in->get_int());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_tag(_in->get_int()));
                         _state = STATE_TYPE;
                         break;
                     case 8:
-                        _listener->on_extra_tag(_in->get_long());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_extra_tag(_in->get_long()));
                         _state = STATE_TYPE;
                         break;
                 }
@@ -397,19 +449,19 @@ void decoder::run() {
             if (_in->has_bytes(_currentLength)) {
                 switch (_currentLength) {
                     case 1:
-                        _listener->on_special(_in->get_byte());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_special(_in->get_byte()));
                         _state = STATE_TYPE;
                         break;
                     case 2:
-                        _listener->on_special(_in->get_short());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_special(_in->get_short()));
                         _state = STATE_TYPE;
                         break;
                     case 4:
-                        _listener->on_special(_in->get_int());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_special(_in->get_int()));
                         _state = STATE_TYPE;
                         break;
                     case 8:
-                        _listener->on_extra_special(_in->get_long());
+						put_decoded_value(result, structures_stack, iter_in_map_key, map_key_temp, CborObject::from_extra_special(_in->get_long()));
                         _state = STATE_TYPE;
                         break;
                 }
@@ -417,8 +469,13 @@ void decoder::run() {
         } else if(_state == STATE_ERROR) {
             break;
         } else {
-            logger("UNKNOWN STATE");
+			throw cbor_decode_exception("UNKNOWN STATE");
         }
     }
+	if (!result)
+		throw cbor_decode_exception("cbor decoded nothing");
+	if (!structures_stack.empty())
+		throw cbor_decode_exception("cbor decode fail with not finished structures");
+	return result;
 }
 

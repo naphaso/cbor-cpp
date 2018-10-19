@@ -14,32 +14,13 @@
 	   limitations under the License.
 */
 
-#ifndef CBOR_CPP_INPUT_H
-#define CBOR_CPP_INPUT_H
+#pragma once
 
-namespace cbor {
-    class input {
-    private:
-        unsigned char *_data;
-        int _size;
-        int _offset;
-    public:
-        input(void *data, int size);
+#include "cborcpp/input.h"
+#include "cborcpp/encoder.h"
+#include "cborcpp/decoder.h"
+#include "cborcpp/output_static.h"
+#include "cborcpp/output_dynamic.h"
+#include "cborcpp/exceptions.h"
+#include "cborcpp/cbor_object.h"
 
-        ~input();
-
-        bool has_bytes(int count);
-
-        unsigned char get_byte();
-
-        unsigned short get_short();
-
-        unsigned int get_int();
-
-        unsigned long long get_long();
-
-        void get_bytes(void *to, int count);
-    };
-}
-
-#endif // CBOR_CPP_INPUT_H

@@ -14,10 +14,11 @@
 	   limitations under the License.
 */
 
-#include "output_dynamic.h"
+#include "cborcpp/output_dynamic.h"
 
 #include <string.h>
 #include <stdlib.h>
+#include <boost/algorithm/hex.hpp>
 
 using namespace cbor;
 
@@ -40,11 +41,11 @@ output_dynamic::~output_dynamic() {
     delete _buffer;
 }
 
-unsigned char *output_dynamic::data() {
+unsigned char *output_dynamic::data() const {
     return _buffer;
 }
 
-unsigned int output_dynamic::size() {
+unsigned int output_dynamic::size() const {
     return _offset;
 }
 

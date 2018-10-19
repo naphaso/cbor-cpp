@@ -14,8 +14,8 @@
 	   limitations under the License.
 */
 
-#include "output_static.h"
-#include "log.h"
+#include "cborcpp/output_static.h"
+#include "cborcpp/exceptions.h"
 
 #include <string.h>
 
@@ -35,7 +35,7 @@ void output_static::put_byte(unsigned char value) {
     if(_offset < _capacity) {
         _buffer[_offset++] = value;
     } else {
-        logger("buffer overflow error");
+        throw cbor_output_exception("buffer overflow error");
     }
 }
 
@@ -44,14 +44,14 @@ void output_static::put_bytes(const unsigned char *data, int size) {
         memcpy(_buffer + _offset, data, size);
         _offset += size;
     } else {
-        logger("buffer overflow error");
+        throw cbor_output_exception("buffer overflow error");
     }
 }
 
-unsigned char *output_static::getData() {
+unsigned char *output_static::getData() const {
     return _buffer;
 }
 
-unsigned int output_static::getSize() {
+unsigned int output_static::getSize() const {
     return _offset;
 }

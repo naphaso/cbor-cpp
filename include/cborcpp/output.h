@@ -13,14 +13,26 @@
 	   See the License for the specific language governing permissions and
 	   limitations under the License.
 */
-	   
-#ifndef LOG_H_
-#define LOG_H_
 
-#include <stdio.h>
+#pragma once
 
-#define logger(line) fprintf(stderr, "%s:%d [%s]: %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, line)
-#define loggerf(format, ...) fprintf(stderr, "%s:%d [%s]: " format "\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__)
+#include <vector>
+#include <string>
 
-#endif
+namespace cbor {
+    class output {
+    public:
+        virtual unsigned char *data() const = 0;
+
+        virtual unsigned int size() const = 0;
+
+		virtual std::vector<unsigned char> bytes() const;
+
+		virtual std::string hex() const;
+
+        virtual void put_byte(unsigned char value) = 0;
+
+        virtual void put_bytes(const unsigned char *data, int size) = 0;
+    };
+}
 

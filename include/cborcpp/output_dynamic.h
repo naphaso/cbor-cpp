@@ -14,11 +14,10 @@
 	   limitations under the License.
 */
 
-#ifndef __CborDynamicOutput_H_
-#define __CborDynamicOutput_H_
+#pragma once
 
-
-#include "output.h"
+#include "cborcpp/output.h"
+#include <vector>
 
 namespace cbor {
     class output_dynamic : public output {
@@ -33,9 +32,9 @@ namespace cbor {
 
         ~output_dynamic();
 
-        virtual unsigned char *data();
+        virtual unsigned char *data() const;
 
-        virtual unsigned int size();
+        virtual unsigned int size() const;
 
         virtual void put_byte(unsigned char value);
 
@@ -46,6 +45,3 @@ namespace cbor {
     };
 }
 
-
-
-#endif //__CborDynamicOutput_H_

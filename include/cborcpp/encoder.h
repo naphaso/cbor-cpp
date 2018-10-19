@@ -14,12 +14,12 @@
 	   limitations under the License.
 */
 
+#pragma once
 
-#ifndef __CborEncoder_H_
-#define __CborEncoder_H_
-
-#include "output.h"
+#include "cborcpp/output.h"
+#include "cborcpp/cbor_object.h"
 #include <string>
+#include <cstdint>
 
 namespace cbor {
     class encoder {
@@ -32,13 +32,13 @@ namespace cbor {
 
         void write_bool(bool value);
         
-        void write_int(int value);
+        void write_int(int32_t value);
 
-        void write_int(long long value);
+        void write_int(int64_t value);
 
-        void write_int(unsigned int value);
+        void write_int(uint32_t value);
 
-        void write_int(unsigned long long value);
+        void write_int(uint64_t value);
 
         void write_bytes(const unsigned char *data, unsigned int size);
 
@@ -58,11 +58,11 @@ namespace cbor {
         
         void write_undefined();
 
-    private:
-        void write_type_value(int major_type, unsigned int value);
+		void write_cbor_object(CborObjectP value);
 
-        void write_type_value(int major_type, unsigned long long value);
+    private:
+        void write_type_value(int major_type, uint32_t value);
+
+        void write_type_value(int major_type, uint64_t value);
     };
 }
-
-#endif //__CborEncoder_H_

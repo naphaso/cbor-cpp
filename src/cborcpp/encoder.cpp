@@ -14,7 +14,8 @@
 	   limitations under the License.
 */
 
-#include "encoder.h"
+#include "cborcpp/encoder.h"
+#include "cborcpp/exceptions.h"
 
 using namespace cbor;
 
@@ -27,7 +28,7 @@ encoder::~encoder() {
 
 }
 
-void encoder::write_type_value(int major_type, unsigned int value) {
+void encoder::write_type_value(int major_type, uint32_t value) {
     major_type <<= 5;
     if(value < 24) {
         _out->put_byte((unsigned char) (major_type | value));
@@ -47,7 +48,7 @@ void encoder::write_type_value(int major_type, unsigned int value) {
     }
 }
 
-void encoder::write_type_value(int major_type, unsigned long long value) {
+void encoder::write_type_value(int major_type, uint64_t value) {
     major_type <<= 5;
     if(value < 24ULL) {
         _out->put_byte((unsigned char) (major_type | value));
@@ -77,27 +78,27 @@ void encoder::write_type_value(int major_type, unsigned long long value) {
     }
 }
 
-void encoder::write_int(unsigned int value) {
+void encoder::write_int(uint32_t value) {
     write_type_value(0, value);
 }
 
-void encoder::write_int(unsigned long long value) {
+void encoder::write_int(uint64_t value) {
     write_type_value(0, value);
 }
 
-void encoder::write_int(long long value) {
+void encoder::write_int(int64_t value) {
     if(value < 0) {
-        write_type_value(1, (unsigned long long) -(value+1));
+        write_type_value(1, (uint64_t) -(value+1));
     } else {
-        write_type_value(0, (unsigned long long) value);
+        write_type_value(0, (uint64_t) value);
     }
 }
 
-void encoder::write_int(int value) {
+void encoder::write_int(int32_t value) {
     if(value < 0) {
-        write_type_value(1, (unsigned int) -(value+1));
+        write_type_value(1, (uint32_t) -(value+1));
     } else {
-        write_type_value(0, (unsigned int) value);
+        write_type_value(0, (uint32_t) value);
     }
 }
 
@@ -147,4 +148,66 @@ void encoder::write_null() {
 
 void encoder::write_undefined() {
     _out->put_byte((unsigned char) 0xf7);
+}
+
+void encoder::write_cbor_object(CborObjectP value) {
+	if (!value)
+		return;
+	switch (value->object_type()) {
+	case CborObjectType::COT_NULL:
+		write_null();
+		return;
+	case CborObjectType::COT_UNDEFINED:
+		write_undefined();
+		return;
+	case CborObjectType::COT_BOOL:
+		write_bool(value->as_bool());
+		return;
+	case CborObjectType::COT_INT:
+		write_int(value->as_int());
+		return;
+	case CborObjectType::COT_EXTRA_INT:
+		write_int(value->as<uint64_t>());
+		return;
+	case CborObjectType::COT_STRING:
+		write_string(value->as_string());
+		return;
+	case CborObjectType::COT_BYTES: {
+		const auto& bytes = value->as_bytes();
+		write_bytes((const unsigned char*)bytes.data(), bytes.size());
+		return;
+	}
+	case CborObjectType::COT_TAG:
+		write_tag(value->as_tag());
+		return;
+	case CborObjectType::COT_EXTRA_TAG:
+		write_tag(value->as<uint64_t>());
+		return;
+	case CborObjectType::COT_SPECIAL:
+		write_special(value->as_special());
+		return;
+	case CborObjectType::COT_EXTRA_SPECIAL:
+		write_special(value->as<uint64_t>());
+		return;
+	case CborObjectType::COT_ARRAY: {
+		const auto& array_value = value->as_array();
+		write_array(array_value.size());
+		for (const auto& item : array_value) {
+			write_cbor_object(item);
+		}
+		return;
+	}
+	case CborObjectType::COT_MAP: {
+		const auto& map_value = value->as_map();
+		write_map(map_value.size());
+		for (const auto& p : map_value) {
+			write_string(p.first);
+			write_cbor_object(p.second);
+		}
+		return;
+	}
+	case CborObjectType::COT_ERROR: {
+		throw cbor_encode_exception("invalid cbor object type");
+	}
+	}
 }
