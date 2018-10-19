@@ -14,31 +14,13 @@
 	   limitations under the License.
 */
 
-#ifndef __CborStaticOutput_H_
-#define __CborStaticOutput_H_
+#pragma once
 
-#include "output.h"
+#include "cborcpp/input.h"
+#include "cborcpp/encoder.h"
+#include "cborcpp/decoder.h"
+#include "cborcpp/output_static.h"
+#include "cborcpp/output_dynamic.h"
+#include "cborcpp/exceptions.h"
+#include "cborcpp/cbor_object.h"
 
-namespace cbor {
-    class output_static : public output {
-    private:
-        unsigned char *_buffer;
-        unsigned int _capacity;
-        unsigned int _offset;
-    public:
-        output_static(unsigned int capacity);
-
-        ~output_static();
-
-        virtual unsigned char *getData();
-
-        virtual unsigned int getSize();
-
-        virtual void put_byte(unsigned char value);
-
-        virtual void put_bytes(const unsigned char *data, int size);
-    };
-}
-
-
-#endif //__CborStaticOutput_H_

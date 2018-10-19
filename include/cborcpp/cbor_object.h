@@ -5,7 +5,7 @@
 #include <map>
 #include <memory>
 #include <algorithm>
-#include "exceptions.h"
+#include "cborcpp/exceptions.h"
 
 namespace cbor {
 	enum CborObjectType {
@@ -31,10 +31,12 @@ namespace cbor {
 	typedef uint32_t CborTagValue;
 	typedef std::vector<char> CborBytesValue;
 	typedef std::vector<CborObjectP> CborArrayValue;
-	typedef std::map<std::string, CborObjectP> CborMapValue;
+	typedef std::map<std::string, CborObjectP, std::less<std::string>> CborMapValue;
 	typedef std::string CborStringValue;
 	typedef std::string CborErrorValue;
 	typedef uint64_t CborExtraIntValue;
+	typedef uint32_t CborSpecialValue;
+	typedef uint64_t CborExtraSpecialValue;
 	typedef boost::variant<CborBoolValue, CborIntValue, CborExtraIntValue, CborTagValue, CborStringValue, CborBytesValue, CborArrayValue, CborMapValue> CborObjectValue;
 
 	struct CborObject {
@@ -75,6 +77,9 @@ namespace cbor {
 		inline bool is_tag() const {
 			return COT_TAG == type;
 		}
+		inline bool is_special() const {
+			return COT_SPECIAL == type;
+		}
 		inline CborObjectType object_type() const {
 			return type;
 		}
@@ -86,6 +91,9 @@ namespace cbor {
 		}
 		inline CborTagValue as_tag() const {
 			return as<CborTagValue>();
+		}
+		inline CborSpecialValue as_special() const {
+			return as<CborSpecialValue>();
 		}
 		inline const CborBytesValue& as_bytes() const {
 			return as<CborBytesValue>();

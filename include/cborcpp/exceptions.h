@@ -102,4 +102,5 @@ namespace cbor
 {
 	CBOR_DECLARE_EXCEPTION(cbor_encode_exception, 101, "cbor encode exception");
 	CBOR_DECLARE_EXCEPTION(cbor_decode_exception, 102, "cbor decode exception");
+	CBOR_DECLARE_EXCEPTION(cbor_output_exception, 103, "cbor output exception");
 }

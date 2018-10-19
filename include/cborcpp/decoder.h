@@ -14,37 +14,38 @@
 	   limitations under the License.
 */
 
+
 #pragma once
 
-#include "output.h"
-#include <vector>
+#include "cborcpp/input.h"
+#include "cborcpp/cbor_object.h"
 
 namespace cbor {
-    class output_dynamic : public output {
+    typedef enum {
+        STATE_TYPE,
+        STATE_PINT,
+        STATE_NINT,
+        STATE_BYTES_SIZE,
+        STATE_BYTES_DATA,
+        STATE_STRING_SIZE,
+        STATE_STRING_DATA,
+        STATE_ARRAY,
+        STATE_MAP,
+        STATE_TAG,
+        STATE_SPECIAL,
+        STATE_ERROR
+    } decoder_state;
+
+    class decoder {
     private:
-        unsigned char *_buffer;
-        unsigned int _capacity;
-        unsigned int _offset;
+        // listener *_listener;
+        input *_in;
+        decoder_state _state;
+        int _currentLength;
     public:
-        output_dynamic();
-
-        output_dynamic(unsigned int inital_capacity);
-
-        ~output_dynamic();
-
-        virtual unsigned char *data();
-
-        virtual unsigned int size();
-
-		virtual std::vector<unsigned char> bytes();
-		virtual std::string hex();
-
-        virtual void put_byte(unsigned char value);
-
-        virtual void put_bytes(const unsigned char *data, int size);
-
-    private:
-        void init(unsigned int initalCapacity);
+        decoder(input &in);
+        ~decoder();
+		CborObjectP run();
+        //void set_listener(listener &listener_instance);
     };
 }
-

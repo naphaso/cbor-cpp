@@ -14,11 +14,10 @@
 	   limitations under the License.
 */
 
+#pragma once
 
-#ifndef __CborEncoder_H_
-#define __CborEncoder_H_
-
-#include "output.h"
+#include "cborcpp/output.h"
+#include "cborcpp/cbor_object.h"
 #include <string>
 
 namespace cbor {
@@ -58,11 +57,11 @@ namespace cbor {
         
         void write_undefined();
 
+		void write_cbor_object(CborObjectP value);
+
     private:
         void write_type_value(int major_type, unsigned int value);
 
         void write_type_value(int major_type, unsigned long long value);
     };
 }
-
-#endif //__CborEncoder_H_

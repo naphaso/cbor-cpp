@@ -13,18 +13,29 @@
 	   See the License for the specific language governing permissions and
 	   limitations under the License.
 */
-	   
-#ifndef LOG_H_
-#define LOG_H_
 
-#include <stdio.h>
+#pragma once
 
-#ifndef __PRETTY_FUNCTION__
-#define __PRETTY_FUNCTION__ __FUNCTION__
-#endif
+#include "cborcpp/output.h"
 
-#define logger(line) fprintf(stderr, "%s:%d [%s]: %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, line)
-#define loggerf(format, ...) fprintf(stderr, "%s:%d [%s]: " format "\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__)
+namespace cbor {
+    class output_static : public output {
+    private:
+        unsigned char *_buffer;
+        unsigned int _capacity;
+        unsigned int _offset;
+    public:
+        output_static(unsigned int capacity);
 
-#endif
+        ~output_static();
+
+        virtual unsigned char *getData() const;
+
+        virtual unsigned int getSize() const;
+
+        virtual void put_byte(unsigned char value);
+
+        virtual void put_bytes(const unsigned char *data, int size);
+    };
+}
 

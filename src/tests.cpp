@@ -16,7 +16,7 @@
 
 #include <stdio.h>
 
-#include "cbor.h"
+#include "cborcpp/cbor.h"
 
 int main() {
 	using namespace cbor;
@@ -25,7 +25,7 @@ int main() {
 
     { //encoding
         cbor::encoder encoder(output);
-		// [123, "bar", 321, 321, "foo", true, false, null, undefined, [123], [], {"hello": "world", "age": 18}, b"abcde"]
+		// [123, "bar", 321, 321, "foo", true, false, null, undefined, [123], [], {"age": 18, "hello": "world"}, b"abcde"]
         encoder.write_array(13);
         {
             encoder.write_int(123);
@@ -45,10 +45,10 @@ int main() {
 			encoder.write_array(0);
 			encoder.write_map(2);
 			{
-				encoder.write_string("hello");
-				encoder.write_string("world");
 				encoder.write_string("age");
 				encoder.write_int(18);
+				encoder.write_string("hello");
+				encoder.write_string("world");
 			}
 			encoder.write_bytes((const unsigned char*)"abcde", 5);
         }
@@ -84,6 +84,12 @@ int main() {
 		assert(obj11.empty());
 		assert(obj12.size() == 2 && obj12["hello"]->as_string() == "world" && obj12["age"]->as_int() == 18);
 		assert(obj13.size() == 5 && memcmp(obj13.data(), "abcde", 5) == 0);
+
+		cbor::output_dynamic output2;
+		cbor::encoder encoder2(output2);
+		encoder2.write_cbor_object(result);
+		auto output2_hex = output2.hex();
+		assert(output2_hex == output_hex);
     }
 
     return 0;

@@ -14,8 +14,7 @@
 	   limitations under the License.
 */
 
-#include "decoder.h"
-#include "log.h"
+#include "cborcpp/decoder.h"
 
 #include <limits.h>
 

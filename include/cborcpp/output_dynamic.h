@@ -14,32 +14,34 @@
 	   limitations under the License.
 */
 
-#ifndef CBOR_CPP_INPUT_H
-#define CBOR_CPP_INPUT_H
+#pragma once
+
+#include "cborcpp/output.h"
+#include <vector>
 
 namespace cbor {
-    class input {
+    class output_dynamic : public output {
     private:
-        unsigned char *_data;
-        int _size;
-        int _offset;
+        unsigned char *_buffer;
+        unsigned int _capacity;
+        unsigned int _offset;
     public:
-        input(void *data, int size);
+        output_dynamic();
 
-        ~input();
+        output_dynamic(unsigned int inital_capacity);
 
-        bool has_bytes(int count);
+        ~output_dynamic();
 
-        unsigned char get_byte();
+        virtual unsigned char *data() const;
 
-        unsigned short get_short();
+        virtual unsigned int size() const;
 
-        unsigned int get_int();
+        virtual void put_byte(unsigned char value);
 
-        unsigned long long get_long();
+        virtual void put_bytes(const unsigned char *data, int size);
 
-        void get_bytes(void *to, int count);
+    private:
+        void init(unsigned int initalCapacity);
     };
 }
 
-#endif // CBOR_CPP_INPUT_H

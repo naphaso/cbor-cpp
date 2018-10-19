@@ -14,7 +14,7 @@
 	   limitations under the License.
 */
 
-#include "input.h"
+#include "cborcpp/input.h"
 
 #include <stdlib.h>
 #include <string.h>

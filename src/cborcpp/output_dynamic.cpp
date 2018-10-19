@@ -14,7 +14,7 @@
 	   limitations under the License.
 */
 
-#include "output_dynamic.h"
+#include "cborcpp/output_dynamic.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -41,24 +41,12 @@ output_dynamic::~output_dynamic() {
     delete _buffer;
 }
 
-unsigned char *output_dynamic::data() {
+unsigned char *output_dynamic::data() const {
     return _buffer;
 }
 
-unsigned int output_dynamic::size() {
+unsigned int output_dynamic::size() const {
     return _offset;
-}
-
-std::vector<unsigned char> output_dynamic::bytes() {
-	std::vector<unsigned char> result(size());
-	memcpy(result.data(), data(), size());
-	return result;
-}
-std::string output_dynamic::hex() {
-	const auto& data_bytes = bytes();
-	std::string res;
-	boost::algorithm::hex(data_bytes.begin(), data_bytes.end(), std::back_inserter(res));
-	return res;
 }
 
 void output_dynamic::put_byte(unsigned char value) {

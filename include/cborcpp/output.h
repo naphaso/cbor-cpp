@@ -14,38 +14,25 @@
 	   limitations under the License.
 */
 
-
 #pragma once
 
-#include "input.h"
-#include "cbor_object.h"
+#include <vector>
+#include <string>
 
 namespace cbor {
-    typedef enum {
-        STATE_TYPE,
-        STATE_PINT,
-        STATE_NINT,
-        STATE_BYTES_SIZE,
-        STATE_BYTES_DATA,
-        STATE_STRING_SIZE,
-        STATE_STRING_DATA,
-        STATE_ARRAY,
-        STATE_MAP,
-        STATE_TAG,
-        STATE_SPECIAL,
-        STATE_ERROR
-    } decoder_state;
-
-    class decoder {
-    private:
-        // listener *_listener;
-        input *_in;
-        decoder_state _state;
-        int _currentLength;
+    class output {
     public:
-        decoder(input &in);
-        ~decoder();
-		CborObjectP run();
-        //void set_listener(listener &listener_instance);
+        virtual unsigned char *data() const = 0;
+
+        virtual unsigned int size() const = 0;
+
+		virtual std::vector<unsigned char> bytes() const;
+
+		virtual std::string hex() const;
+
+        virtual void put_byte(unsigned char value) = 0;
+
+        virtual void put_bytes(const unsigned char *data, int size) = 0;
     };
 }
+

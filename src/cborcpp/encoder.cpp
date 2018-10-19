@@ -14,7 +14,8 @@
 	   limitations under the License.
 */
 
-#include "encoder.h"
+#include "cborcpp/encoder.h"
+#include "cborcpp/exceptions.h"
 
 using namespace cbor;
 
@@ -147,4 +148,66 @@ void encoder::write_null() {
 
 void encoder::write_undefined() {
     _out->put_byte((unsigned char) 0xf7);
+}
+
+void encoder::write_cbor_object(CborObjectP value) {
+	if (!value)
+		return;
+	switch (value->object_type()) {
+	case CborObjectType::COT_NULL:
+		write_null();
+		return;
+	case CborObjectType::COT_UNDEFINED:
+		write_undefined();
+		return;
+	case CborObjectType::COT_BOOL:
+		write_bool(value->as_bool());
+		return;
+	case CborObjectType::COT_INT:
+		write_int(value->as_int());
+		return;
+	case CborObjectType::COT_EXTRA_INT:
+		write_int(value->as<uint64_t>());
+		return;
+	case CborObjectType::COT_STRING:
+		write_string(value->as_string());
+		return;
+	case CborObjectType::COT_BYTES: {
+		const auto& bytes = value->as_bytes();
+		write_bytes((const unsigned char*)bytes.data(), bytes.size());
+		return;
+	}
+	case CborObjectType::COT_TAG:
+		write_tag(value->as_tag());
+		return;
+	case CborObjectType::COT_EXTRA_TAG:
+		write_tag(value->as<uint64_t>());
+		return;
+	case CborObjectType::COT_SPECIAL:
+		write_special(value->as_special());
+		return;
+	case CborObjectType::COT_EXTRA_SPECIAL:
+		write_special(value->as<uint64_t>());
+		return;
+	case CborObjectType::COT_ARRAY: {
+		const auto& array_value = value->as_array();
+		write_array(array_value.size());
+		for (const auto& item : array_value) {
+			write_cbor_object(item);
+		}
+		return;
+	}
+	case CborObjectType::COT_MAP: {
+		const auto& map_value = value->as_map();
+		write_map(map_value.size());
+		for (const auto& p : map_value) {
+			write_string(p.first);
+			write_cbor_object(p.second);
+		}
+		return;
+	}
+	case CborObjectType::COT_ERROR: {
+		throw cbor_encode_exception("invalid cbor object type");
+	}
+	}
 }
