@@ -101,6 +101,28 @@ void encoder::write_int(int value) {
     }
 }
 
+void encoder::write_float(float value) {
+  void* punny = &value;
+  _out->put_byte((unsigned char) (7<<5) | 26);
+  _out->put_byte(*((uint8_t*) punny+3));
+  _out->put_byte(*((uint8_t*) punny+2));
+  _out->put_byte(*((uint8_t*) punny+1));
+  _out->put_byte(*((uint8_t*) punny+0));
+}
+
+void encoder::write_double(double value) {
+  void* punny = &value;
+  _out->put_byte((unsigned char) (7<<5) | 27);
+  _out->put_byte(*((uint8_t*) punny+7));
+  _out->put_byte(*((uint8_t*) punny+6));
+  _out->put_byte(*((uint8_t*) punny+5));
+  _out->put_byte(*((uint8_t*) punny+4));
+  _out->put_byte(*((uint8_t*) punny+3));
+  _out->put_byte(*((uint8_t*) punny+2));
+  _out->put_byte(*((uint8_t*) punny+1));
+  _out->put_byte(*((uint8_t*) punny+0));
+}
+
 void encoder::write_bytes(const unsigned char *data, unsigned int size) {
     write_type_value(2, size);
     _out->put_bytes(data, size);

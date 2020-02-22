@@ -24,6 +24,9 @@ namespace cbor {
     public:
         virtual void on_integer(int value) = 0;
 
+        virtual void on_float32(float value) = 0;
+        virtual void on_double(double value) = 0;
+
         virtual void on_bytes(unsigned char *data, int size) = 0;
 
         virtual void on_string(std::string &str) = 0;
