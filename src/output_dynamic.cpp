@@ -37,7 +37,7 @@ output_dynamic::output_dynamic(unsigned int inital_capacity) {
 }
 
 output_dynamic::~output_dynamic() {
-    delete _buffer;
+    delete[] _buffer;
 }
 
 unsigned char *output_dynamic::data() {
