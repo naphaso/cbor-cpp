@@ -35,6 +35,8 @@ namespace cbor {
         unsigned short get_short();
 
         unsigned int get_int();
+        float get_float();
+        double get_double();
 
         unsigned long long get_long();
 
