@@ -61,6 +61,11 @@ namespace cbor {
         template<typename T>
         void p(const std::string & tag, const T& value) const noexcept {
             std::cout << "[" << tag << sizeof(T) << " = " << value << "]\n";
+        }
+
+        template<>
+        void p(const std::string & tag, const std::string& value) const noexcept {
+            std::cout << "[" << tag << value.length() << " = '" << value << "']\n";
         } 
     };
 }

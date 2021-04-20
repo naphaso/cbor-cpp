@@ -23,7 +23,8 @@ void listener_debug::on_integer(int value) const noexcept {
 }
 
 void listener_debug::on_bytes(unsigned char *data, int size) const noexcept {
-    printf("bytes with size: %d", size);
+    p("b", data);
+    p("len", size);
 }
 
 void listener_debug::on_string(std::string &str) const noexcept {
@@ -31,11 +32,11 @@ void listener_debug::on_string(std::string &str) const noexcept {
 }
 
 void listener_debug::on_array(int size) const noexcept {
-    printf("array: %d\n", size);
+    p("array n", size);
 }
 
 void listener_debug::on_map(int size) const noexcept {
-    printf("map: %d\n", size);
+    p("map", size);
 }
 
 void listener_debug::on_tag(unsigned int tag) const noexcept {
@@ -64,9 +65,9 @@ void listener_debug::on_error(const char *error) const noexcept {
 
 void listener_debug::on_extra_integer(unsigned long long value, int sign) const noexcept {
     if(sign >= 0) {
-        printf("extra integer: %llu\n", value);
+        p("exint", value);
     } else {
-        printf("extra integer: -%llu\n", value);
+        p("exint", -value);
     }
 }
 
