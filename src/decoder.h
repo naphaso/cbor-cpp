@@ -23,18 +23,18 @@
 
 namespace cbor {
     enum class decoder_state : uint8_t {
-        STATE_TYPE,
-        STATE_PINT,
-        STATE_NINT,
-        STATE_BYTES_SIZE,
-        STATE_BYTES_DATA,
-        STATE_STRING_SIZE,
-        STATE_STRING_DATA,
-        STATE_ARRAY,
-        STATE_MAP,
-        STATE_TAG,
-        STATE_SPECIAL,
-        STATE_ERROR
+        type,
+        pint,
+        nint,
+        bytes_size,
+        bytes_data,
+        string_size,
+        string_data,
+        array,
+        map,
+        tag,
+        special,
+        error
     };
 
     class decoder {
