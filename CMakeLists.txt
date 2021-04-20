@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 project(cborcpp)
 
 set(CMAKE_BUILD_TYPE Release)
+set(EXPORT_COMPILE_COMMANDS ON)
 
 # On Mac OS 'CXX_STANDARD' is not evaluated
 # Instead we have to set the compiler flag
