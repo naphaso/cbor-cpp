@@ -22,30 +22,30 @@
 #include "input.h"
 
 namespace cbor {
-    typedef enum {
-        STATE_TYPE,
-        STATE_PINT,
-        STATE_NINT,
-        STATE_BYTES_SIZE,
-        STATE_BYTES_DATA,
-        STATE_STRING_SIZE,
-        STATE_STRING_DATA,
-        STATE_ARRAY,
-        STATE_MAP,
-        STATE_TAG,
-        STATE_SPECIAL,
-        STATE_ERROR
-    } decoder_state;
+    enum class decoder_state : uint8_t {
+        type,
+        pint,
+        nint,
+        bytes_size,
+        bytes_data,
+        string_size,
+        string_data,
+        array,
+        map,
+        tag,
+        special,
+        error
+    };
 
     class decoder {
     private:
-        listener *_listener;
-        input *_in;
-        decoder_state _state;
-        int _currentLength;
+        listener *m_listener;
+        input *m_in;
+        decoder_state m_state;
+        int m_currentLength;
     public:
-        decoder(input &in);
-        decoder(input &in, listener &listener);
+        explicit decoder(input &in);
+        explicit decoder(input &in, listener &listener);
         ~decoder();
         void run();
         void set_listener(listener &listener_instance);

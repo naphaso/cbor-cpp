@@ -22,11 +22,11 @@
 namespace cbor {
     class output_static : public output {
     private:
-        unsigned char *_buffer;
-        unsigned int _capacity;
-        unsigned int _offset;
+        unsigned char *m_buffer;
+        unsigned int m_capacity;
+        unsigned int m_offset;
     public:
-        output_static(unsigned int capacity);
+        explicit output_static(unsigned int capacity);
 
         ~output_static();
 

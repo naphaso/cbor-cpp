@@ -18,62 +18,63 @@
 
 using namespace cbor;
 
-void listener_debug::on_integer(int value) {
-    printf("integer: %d\n", value);
+void listener_debug::on_integer(int value) const noexcept {
+    p("i", value);
 }
 
-void listener_debug::on_bytes(unsigned char *data, int size) {
-    printf("bytes with size: %d", size);
+void listener_debug::on_bytes(unsigned char *data, int size) const noexcept {
+    p("b", data);
+    p("len", size);
 }
 
-void listener_debug::on_string(std::string &str) {
-    printf("string: '%.*s'\n", (int)str.size(), str.c_str());
+void listener_debug::on_string(std::string &str) const noexcept {
+    p("s", str);
 }
 
-void listener_debug::on_array(int size) {
-    printf("array: %d\n", size);
+void listener_debug::on_array(int size) const noexcept {
+    p("array n", size);
 }
 
-void listener_debug::on_map(int size) {
-    printf("map: %d\n", size);
+void listener_debug::on_map(int size) const noexcept {
+    p("map", size);
 }
 
-void listener_debug::on_tag(unsigned int tag) {
-    printf("tag: %d\n", tag);
+void listener_debug::on_tag(unsigned int tag) const noexcept {
+    p("t", tag);
 }
 
-void listener_debug::on_special(unsigned int code) {
-    printf("special: %d\n", code);
+void listener_debug::on_special(unsigned int code) const noexcept {
+    p("spc", code);
 }
 
-void listener_debug::on_bool(bool value) {
-    printf("bool: %s\n", value ? "true" : "false");
+void listener_debug::on_bool(bool value) const noexcept {
+    p("b", value);
 }
 
-void listener_debug::on_null() {
-    printf("special: null\n");
+void listener_debug::on_null() const noexcept {
+    p("spc", "null");
 }
 
-void listener_debug::on_undefined() {
-    printf("special: undefined\n");
+void listener_debug::on_undefined() const noexcept {
+    p("spc", "undef");
 }
 
-void listener_debug::on_error(const char *error) {
-    printf("error: %s\n", error);
+void listener_debug::on_error(const char *error) const noexcept {
+    p("err", error);
 }
 
-void listener_debug::on_extra_integer(unsigned long long value, int sign) {
+void listener_debug::on_extra_integer(unsigned long long value, int sign) const noexcept {
     if(sign >= 0) {
-        printf("extra integer: %llu\n", value);
+        p("exint", value);
     } else {
-        printf("extra integer: -%llu\n", value);
+        p("exint", -value);
     }
 }
 
-void listener_debug::on_extra_tag(unsigned long long tag) {
-    printf("extra tag: %llu\n", tag);
+void listener_debug::on_extra_tag(unsigned long long tag) const noexcept {
+    p("ext", tag);
 }
 
-void listener_debug::on_extra_special(unsigned long long tag) {
-    printf("extra special: %llu\n", tag);
+void listener_debug::on_extra_special(unsigned long long tag) const noexcept {
+    p("extspc", tag);
 }
