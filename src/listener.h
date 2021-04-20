@@ -20,43 +20,45 @@
 #include <string>
 
 namespace cbor {
-    class listener {
-    public:
-        virtual void on_integer(int value) = 0;
+    struct listener {
+    
+        virtual void on_integer(int value) const noexcept {}
 
-        virtual void on_float32(float value) = 0;
-        virtual void on_double(double value) = 0;
+        virtual void on_float32(float value) const noexcept {}
+        virtual void on_double(double value) const noexcept {}
 
-        virtual void on_bytes(unsigned char *data, int size) = 0;
+        virtual void on_bytes(unsigned char *data, int size) const noexcept {}
 
-        virtual void on_string(std::string &str) = 0;
+        virtual void on_string(std::string &str) const noexcept {}
 
-        virtual void on_array(int size) = 0;
+        virtual void on_array(int size) const noexcept {}
 
-        virtual void on_map(int size) = 0;
+        virtual void on_map(int size) const noexcept {}
 
-        virtual void on_tag(unsigned int tag) = 0;
+        virtual void on_tag(unsigned int tag) const noexcept {}
 
-        virtual void on_special(unsigned int code) = 0;
+        virtual void on_special(unsigned int code) const noexcept {}
         
-        virtual void on_bool(bool) = 0;
+        virtual void on_bool(bool) const noexcept {}
         
-        virtual void on_null() = 0;
+        virtual void on_null() const noexcept {}
         
-        virtual void on_undefined() = 0;
+        virtual void on_undefined() const noexcept {}
 
-        virtual void on_error(const char *error) = 0;
+        virtual void on_error(const char *error) const noexcept {}
 
-        virtual void on_extra_integer(unsigned long long value, int sign) {
+        virtual void on_extra_integer(unsigned long long value, int sign) const noexcept {
         }
 
-        virtual void on_extra_tag(unsigned long long tag) {
+        virtual void on_extra_tag(unsigned long long tag) const noexcept {
         }
 
-        virtual void on_extra_special(unsigned long long tag) {
+        virtual void on_extra_special(unsigned long long tag) const noexcept {
         }
     };
 }
+
+
 
 
 #endif // CBOR_CPP_LISTENER_H
