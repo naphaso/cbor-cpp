@@ -26,7 +26,7 @@ namespace cbor {
         unsigned int m_capacity;
         unsigned int m_offset;
     public:
-        output_static(unsigned int capacity);
+        explicit output_static(unsigned int capacity);
 
         ~output_static();
 

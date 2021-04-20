@@ -44,8 +44,8 @@ namespace cbor {
         decoder_state m_state;
         int m_currentLength;
     public:
-        decoder(input &in);
-        decoder(input &in, listener &listener);
+        explicit decoder(input &in);
+        explicit decoder(input &in, listener &listener);
         ~decoder();
         void run();
         void set_listener(listener &listener_instance);

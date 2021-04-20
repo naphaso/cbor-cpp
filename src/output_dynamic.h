@@ -29,7 +29,7 @@ namespace cbor {
     public:
         output_dynamic();
 
-        output_dynamic(unsigned int inital_capacity);
+        explicit output_dynamic(unsigned int inital_capacity);
 
         ~output_dynamic();
 
