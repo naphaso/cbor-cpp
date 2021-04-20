@@ -22,7 +22,7 @@ namespace cbor {
     private:
         unsigned char *_data;
         int _size;
-        int _offset;
+        int m_offset;
     public:
         input(void *data, int size);
 

@@ -23,9 +23,9 @@
 namespace cbor {
     class output_dynamic : public output {
     private:
-        unsigned char *_buffer;
-        unsigned int _capacity;
-        unsigned int _offset;
+        unsigned char *m_buffer;
+        unsigned int m_capacity;
+        unsigned int m_offset;
     public:
         output_dynamic();
 
