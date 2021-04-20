@@ -15,9 +15,9 @@
 */
 
 #include "decoder.h"
-#include "log.h"
 
 #include <limits.h>
+#include <iostream>
 
 using namespace cbor;
 
@@ -417,7 +417,7 @@ void decoder::run() {
         } else if(m_state == decoder_state::error) {
             break;
         } else {
-            logger("UNKNOWN STATE");
+            std::cerr << "UNKNOWN STATE";
         }
     }
 }
