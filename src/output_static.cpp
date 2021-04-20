@@ -22,36 +22,36 @@
 using namespace cbor;
 
 output_static::output_static(unsigned int capacity) {
-    this->_capacity = capacity;
-    this->_buffer = new unsigned char[capacity];
-    this->_offset = 0;
+    this->m_capacity = capacity;
+    this->m_buffer = new unsigned char[capacity];
+    this->m_offset = 0;
 }
 
 output_static::~output_static() {
-    delete _buffer;
+    delete m_buffer;
 }
 
 void output_static::put_byte(unsigned char value) {
-    if(_offset < _capacity) {
-        _buffer[_offset++] = value;
+    if(m_offset < m_capacity) {
+        m_buffer[m_offset++] = value;
     } else {
         logger("buffer overflow error");
     }
 }
 
 void output_static::put_bytes(const unsigned char *data, int size) {
-    if(_offset + size - 1 < _capacity) {
-        memcpy(_buffer + _offset, data, size);
-        _offset += size;
+    if(m_offset + size - 1 < m_capacity) {
+        memcpy(m_buffer + m_offset, data, size);
+        m_offset += size;
     } else {
         logger("buffer overflow error");
     }
 }
 
 unsigned char *output_static::getData() {
-    return _buffer;
+    return m_buffer;
 }
 
 unsigned int output_static::getSize() {
-    return _offset;
+    return m_offset;
 }

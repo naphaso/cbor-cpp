@@ -39,10 +39,10 @@ namespace cbor {
 
     class decoder {
     private:
-        listener *_listener;
-        input *_in;
-        decoder_state _state;
-        int _currentLength;
+        listener *m_listener;
+        input *m_in;
+        decoder_state m_state;
+        int m_currentLength;
     public:
         decoder(input &in);
         decoder(input &in, listener &listener);
