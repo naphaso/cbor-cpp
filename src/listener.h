@@ -18,6 +18,7 @@
 #define CBOR_CPP_LISTENER_H
 
 #include <string>
+#include <iostream>
 
 namespace cbor {
     struct listener {
@@ -55,6 +56,17 @@ namespace cbor {
 
         virtual void on_extra_special(unsigned long long tag) const noexcept {
         }
+
+    protected:
+        template<typename T>
+        void p(const std::string & tag, const T& value) const noexcept {
+            std::cout << "[" << tag << sizeof(T) << " = " << value << "]\n";
+        }
+
+        template<>
+        void p(const std::string & tag, const std::string& value) const noexcept {
+            std::cout << "[" << tag << value.length() << " = '" << value << "']\n";
+        } 
     };
 }
 
