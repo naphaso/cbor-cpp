@@ -19,7 +19,7 @@
 using namespace cbor;
 
 void listener_debug::on_integer(int value) const noexcept {
-    printf("integer: %d\n", value);
+    p("i", value);
 }
 
 void listener_debug::on_bytes(unsigned char *data, int size) const noexcept {
@@ -27,7 +27,7 @@ void listener_debug::on_bytes(unsigned char *data, int size) const noexcept {
 }
 
 void listener_debug::on_string(std::string &str) const noexcept {
-    printf("string: '%.*s'\n", (int)str.size(), str.c_str());
+    p("s", str);
 }
 
 void listener_debug::on_array(int size) const noexcept {
@@ -39,27 +39,27 @@ void listener_debug::on_map(int size) const noexcept {
 }
 
 void listener_debug::on_tag(unsigned int tag) const noexcept {
-    printf("tag: %d\n", tag);
+    p("t", tag);
 }
 
 void listener_debug::on_special(unsigned int code) const noexcept {
-    printf("special: %d\n", code);
+    p("spc", code);
 }
 
 void listener_debug::on_bool(bool value) const noexcept {
-    printf("bool: %s\n", value ? "true" : "false");
+    p("b", value);
 }
 
 void listener_debug::on_null() const noexcept {
-    printf("special: null\n");
+    p("spc", "null");
 }
 
 void listener_debug::on_undefined() const noexcept {
-    printf("special: undefined\n");
+    p("spc", "undef");
 }
 
 void listener_debug::on_error(const char *error) const noexcept {
-    printf("error: %s\n", error);
+    p("err", error);
 }
 
 void listener_debug::on_extra_integer(unsigned long long value, int sign) const noexcept {
@@ -71,9 +71,9 @@ void listener_debug::on_extra_integer(unsigned long long value, int sign) const 
 }
 
 void listener_debug::on_extra_tag(unsigned long long tag) const noexcept {
-    printf("extra tag: %llu\n", tag);
+    p("ext", tag);
 }
 
 void listener_debug::on_extra_special(unsigned long long tag) const noexcept {
-    printf("extra special: %llu\n", tag);
+    p("extspc", tag);
 }
