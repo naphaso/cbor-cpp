@@ -40,7 +40,7 @@ namespace cbor {
     class decoder {
     private:
         listener *m_listener;
-        input *_in;
+        input *m_in;
         decoder_state _state;
         int _currentLength;
     public:
