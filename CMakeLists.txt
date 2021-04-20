@@ -14,8 +14,9 @@ set(SOURCE_FILES
     )
 
 set(TEST_SOURCE_FILES
-    src/tests.cpp
+    test/tests.cpp
     )
 
 add_library(cborcpp SHARED ${SOURCE_FILES})
 add_executable(testing ${SOURCE_FILES} ${TEST_SOURCE_FILES})
+target_include_directories(testing PRIVATE src)
