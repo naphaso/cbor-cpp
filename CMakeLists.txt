@@ -1,8 +1,14 @@
 cmake_minimum_required(VERSION 3.15)
 project(cborcpp)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_BUILD_TYPE Release)
+set(EXPORT_COMPILE_COMMANDS ON)
+
+# On Mac OS 'CXX_STANDARD' is not evaluated
+# Instead we have to set the compiler flag
+if (APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+endif() 
 
 set(SOURCE_FILES
     src/encoder.cpp
@@ -18,5 +24,6 @@ set(TEST_SOURCE_FILES
     )
 
 add_library(cborcpp SHARED ${SOURCE_FILES})
+set_property(TARGET cborcpp PROPERTY CXX_STANDARD 14)
 add_executable(testing ${SOURCE_FILES} ${TEST_SOURCE_FILES})
 target_include_directories(testing PRIVATE src)
