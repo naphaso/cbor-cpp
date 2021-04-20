@@ -56,16 +56,14 @@ struct listener {
   virtual void on_extra_special(unsigned long long tag) const noexcept {}
 
 protected:
-  template <typename T>
-  void p(const std::string &tag, const T &value) const noexcept {
-    std::cout << "[" << tag << sizeof(T) << " = " << value << "]\n";
-  }
-
-  template <>
-  void p<std::string>(const std::string &tag, const std::string &value) const noexcept {
-    std::cout << "[" << tag << value.length() << " = '" << value << "']\n";
-  }
 };
+template <class T> inline void p(const std::string &tag, const T &value) {
+  std::cout << "[" << tag << sizeof(T) << " = " << value << "]\n";
+}
+
+template <> inline void p(const std::string &tag, const std::string &value) {
+  std::cout << "[" << tag << value.length() << " = '" << value << "']\n";
+}
 
 } // namespace cbor
 
