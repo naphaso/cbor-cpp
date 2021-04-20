@@ -22,7 +22,7 @@
 #include "input.h"
 
 namespace cbor {
-    typedef enum {
+    enum class decoder_state : uint8_t {
         STATE_TYPE,
         STATE_PINT,
         STATE_NINT,
@@ -35,7 +35,7 @@ namespace cbor {
         STATE_TAG,
         STATE_SPECIAL,
         STATE_ERROR
-    } decoder_state;
+    };
 
     class decoder {
     private:
