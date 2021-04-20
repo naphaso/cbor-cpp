@@ -41,8 +41,8 @@ namespace cbor {
     private:
         listener *m_listener;
         input *m_in;
-        decoder_state _state;
-        int _currentLength;
+        decoder_state m_state;
+        int m_currentLength;
     public:
         decoder(input &in);
         decoder(input &in, listener &listener);
