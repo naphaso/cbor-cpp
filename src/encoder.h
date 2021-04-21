@@ -15,8 +15,7 @@
 */
 
 
-#ifndef __CborEncoder_H_
-#define __CborEncoder_H_
+#pragma once
 
 #include "output.h"
 #include <string>
@@ -68,5 +67,3 @@ namespace cbor {
         void write_type_value(int major_type, unsigned long long value);
     };
 }
-
-#endif //__CborEncoder_H_

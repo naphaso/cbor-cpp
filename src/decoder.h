@@ -15,8 +15,7 @@
 */
 
 
-#ifndef __CborDecoder_H_
-#define __CborDecoder_H_
+#pragma once
 
 #include "listener.h"
 #include "input.h"
@@ -51,6 +50,3 @@ namespace cbor {
         void set_listener(listener &listener_instance);
     };
 }
-
-
-#endif //__CborDecoder_H_

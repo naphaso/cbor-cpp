@@ -14,8 +14,7 @@
 	   limitations under the License.
 */
 
-#ifndef CBOR_CPP_INPUT_H
-#define CBOR_CPP_INPUT_H
+#pragma once
 
 namespace cbor {
     class input {
@@ -43,5 +42,3 @@ namespace cbor {
         void get_bytes(void *to, int count);
     };
 }
-
-#endif // CBOR_CPP_INPUT_H

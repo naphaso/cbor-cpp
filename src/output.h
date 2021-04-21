@@ -15,8 +15,7 @@
 */
 
 
-#ifndef __CborOutput_H_
-#define __CborOutput_H_
+#pragma once
 
 namespace cbor {
     class output {
@@ -30,5 +29,3 @@ namespace cbor {
         virtual void put_bytes(const unsigned char *data, int size) = 0;
     };
 }
-
-#endif //__CborOutput_H_

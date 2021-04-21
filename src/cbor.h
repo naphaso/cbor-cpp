@@ -14,8 +14,7 @@
 	   limitations under the License.
 */
 
-#ifndef CBOR_CPP_CBOR_H
-#define CBOR_CPP_CBOR_H
+#pragma once
 
 #include "input.h"
 #include "encoder.h"
@@ -24,5 +23,3 @@
 #include "output_static.h"
 #include "output_dynamic.h"
 #include "listener_debug.h"
-
-#endif //CBOR_CPP_CBOR_H

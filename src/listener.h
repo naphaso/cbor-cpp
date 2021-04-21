@@ -14,8 +14,7 @@
            limitations under the License.
 */
 
-#ifndef CBOR_CPP_LISTENER_H
-#define CBOR_CPP_LISTENER_H
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -66,5 +65,3 @@ template <> inline void p(const std::string &tag, const std::string &value) {
 }
 
 } // namespace cbor
-
-#endif // CBOR_CPP_LISTENER_H

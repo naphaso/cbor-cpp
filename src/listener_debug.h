@@ -14,8 +14,7 @@
 	   limitations under the License.
 */
 
-#ifndef __listener_debug_H_
-#define __listener_debug_H_
+#pragma once
 
 #include <string>
 
@@ -53,5 +52,3 @@ namespace cbor {
         virtual void on_extra_special(unsigned long long tag) const noexcept override;
     };
 }
-
-#endif //__listener_debug_H_
