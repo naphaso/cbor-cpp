@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <vector>
 
 namespace cbor {
@@ -41,6 +42,6 @@ namespace cbor {
         std::string get_str(int count);
     private:
         std::vector<uint8_t> m_data{};
-        int m_offset{};
+        size_t m_offset{};
     };
 }
