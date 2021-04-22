@@ -24,11 +24,11 @@ using namespace cbor;
 output::output(unsigned int initalCapacity) : m_buffer(initalCapacity) {
 }
 
-uint8_t *output::data() {
-    return m_buffer.data();
+std::vector<uint8_t> output::data() {
+    return m_buffer;
 }
 
-unsigned int output::size() {
+size_t output::size() {
     return m_buffer.size();
 }
 

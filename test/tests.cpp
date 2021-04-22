@@ -38,7 +38,7 @@ int main() {
     }
 
     { // decoding
-        cbor::input input(output.data(), output.size());
+        cbor::input input(output.data());
         cbor::listener_debug listener;
         cbor::decoder decoder;
         decoder.run(input, listener);

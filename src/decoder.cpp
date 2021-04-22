@@ -24,13 +24,14 @@ using namespace cbor;
 void decoder::run(input& input, listener& listener) {
     unsigned int temp;
     int m_currentLength {};
+    m_state = decoder_state::type;
 
     while(1) {
         if(m_state == decoder_state::type) {
             if(input.has_bytes(1)) {
-                unsigned char type = input.get_byte();
-                unsigned char majorType = type >> 5;
-                unsigned char minorType = (unsigned char) (type & 31);
+                uint8_t type = input.get_byte();
+                uint8_t majorType = type >> 5;
+                uint8_t minorType = (uint8_t) (type & 31);
 
                 switch(majorType) {
                     case 0: // positive integer
@@ -279,10 +280,9 @@ void decoder::run(input& input, listener& listener) {
             } else break;
         } else if(m_state == decoder_state::bytes_data) {
             if(input.has_bytes(m_currentLength)) {
-                unsigned char *data = new unsigned char[m_currentLength];
-                input.get_bytes(data, m_currentLength);
+                auto data = input.get_bytes(m_currentLength);
                 m_state = decoder_state::type;
-                listener.on_bytes(data, m_currentLength);
+                listener.on_bytes(data.data(), m_currentLength);
             } else break;
         } else if(m_state == decoder_state::string_size) {
             if(input.has_bytes(m_currentLength)) {
@@ -307,11 +307,8 @@ void decoder::run(input& input, listener& listener) {
             } else break;
         } else if(m_state == decoder_state::string_data) {
             if(input.has_bytes(m_currentLength)) {
-                unsigned char *data = new unsigned char[m_currentLength];
-                input.get_bytes(data, m_currentLength);
                 m_state = decoder_state::type;
-                std::string str((const char *)data, (size_t)m_currentLength);
-                listener.on_string(str);
+                listener.on_string(input.get_str(m_currentLength));
             } else break;
         } else if(m_state == decoder_state::array) {
             if(input.has_bytes(m_currentLength)) {
@@ -401,6 +398,7 @@ void decoder::run(input& input, listener& listener) {
             break;
         } else {
             std::cerr << "UNKNOWN STATE";
+            exit(2);
         }
     }
 }
