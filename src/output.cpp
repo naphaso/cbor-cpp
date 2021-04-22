@@ -14,27 +14,30 @@
 	   limitations under the License.
 */
 
-#pragma once
-
 #include "output.h"
 
-namespace cbor {
-    class output_static : public output {
-    private:
-        unsigned char *m_buffer;
-        unsigned int m_capacity;
-        unsigned int m_offset;
-    public:
-        explicit output_static(unsigned int capacity);
+#include <string.h>
+#include <stdlib.h>
 
-        ~output_static();
+using namespace cbor;
 
-        virtual unsigned char *getData();
+output::output(unsigned int initalCapacity) : m_buffer(initalCapacity) {
+}
 
-        virtual unsigned int getSize();
+uint8_t *output::data() {
+    return m_buffer.data();
+}
 
-        virtual void put_byte(unsigned char value);
+unsigned int output::size() {
+    return m_buffer.size();
+}
 
-        virtual void put_bytes(const unsigned char *data, int size);
-    };
+void output::put_byte(uint8_t value) {
+    m_buffer.push_back(value);
+}
+
+void output::put_bytes(const uint8_t *data, int size) {
+    for(auto i = 0; i < size; i++) {
+        m_buffer.push_back(data[i]);
+    }
 }
