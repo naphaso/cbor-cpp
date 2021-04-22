@@ -16,7 +16,11 @@
 
 #pragma once
 
+#include <memory>
+
 namespace cbor {
+  
+
     class input {
     private:
         unsigned char *_data;

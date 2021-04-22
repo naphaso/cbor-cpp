@@ -21,8 +21,7 @@
 #include "input.h"
 
 namespace cbor {
-    using listener_ptr = std::shared_ptr<listener>;
-
+    
     enum class decoder_state : uint8_t {
         type,
         pint,
@@ -38,17 +37,9 @@ namespace cbor {
         error
     };
 
-    class decoder {
+    struct decoder {
+        void run(input& input, listener& listener);
     private:
-        listener_ptr m_listener;
-        input *m_in;
         decoder_state m_state;
-        int m_currentLength;
-    public:
-        explicit decoder(input &in);
-        explicit decoder(input &in, listener_ptr listener);
-        ~decoder();
-        void run();
-        void set_listener(listener_ptr listener);
     };
 }

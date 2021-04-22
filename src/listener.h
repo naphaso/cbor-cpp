@@ -20,6 +20,7 @@
 #include <string>
 
 namespace cbor {
+
 struct listener {
 
   virtual void on_integer(int value) const noexcept {}
@@ -56,6 +57,10 @@ struct listener {
 
 protected:
 };
+
+using listener_ptr = std::shared_ptr<listener>;
+
+
 template <class T> inline void p(const std::string &tag, const T &value) {
   std::cout << "[" << tag << sizeof(T) << " = " << value << "]\n";
 }
