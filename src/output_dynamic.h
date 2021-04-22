@@ -14,8 +14,7 @@
 	   limitations under the License.
 */
 
-#ifndef __CborDynamicOutput_H_
-#define __CborDynamicOutput_H_
+#pragma once
 
 
 #include "output.h"
@@ -45,7 +44,3 @@ namespace cbor {
         void init(unsigned int initalCapacity);
     };
 }
-
-
-
-#endif //__CborDynamicOutput_H_

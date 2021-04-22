@@ -14,10 +14,13 @@
 	   limitations under the License.
 */
 
-#ifndef CBOR_CPP_INPUT_H
-#define CBOR_CPP_INPUT_H
+#pragma once
+
+#include <memory>
 
 namespace cbor {
+  
+
     class input {
     private:
         unsigned char *_data;
@@ -43,5 +46,3 @@ namespace cbor {
         void get_bytes(void *to, int count);
     };
 }
-
-#endif // CBOR_CPP_INPUT_H

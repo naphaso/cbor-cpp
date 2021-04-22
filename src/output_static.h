@@ -14,8 +14,7 @@
 	   limitations under the License.
 */
 
-#ifndef __CborStaticOutput_H_
-#define __CborStaticOutput_H_
+#pragma once
 
 #include "output.h"
 
@@ -39,6 +38,3 @@ namespace cbor {
         virtual void put_bytes(const unsigned char *data, int size);
     };
 }
-
-
-#endif //__CborStaticOutput_H_

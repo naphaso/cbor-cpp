@@ -14,13 +14,13 @@
            limitations under the License.
 */
 
-#ifndef CBOR_CPP_LISTENER_H
-#define CBOR_CPP_LISTENER_H
+#pragma once
 
 #include <iostream>
 #include <string>
 
 namespace cbor {
+
 struct listener {
 
   virtual void on_integer(int value) const noexcept {}
@@ -57,6 +57,10 @@ struct listener {
 
 protected:
 };
+
+using listener_ptr = std::shared_ptr<listener>;
+
+
 template <class T> inline void p(const std::string &tag, const T &value) {
   std::cout << "[" << tag << sizeof(T) << " = " << value << "]\n";
 }
@@ -66,5 +70,3 @@ template <> inline void p(const std::string &tag, const std::string &value) {
 }
 
 } // namespace cbor
-
-#endif // CBOR_CPP_LISTENER_H

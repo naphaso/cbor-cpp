@@ -15,13 +15,13 @@
 */
 
 
-#ifndef __CborDecoder_H_
-#define __CborDecoder_H_
+#pragma once
 
 #include "listener.h"
 #include "input.h"
 
 namespace cbor {
+    
     enum class decoder_state : uint8_t {
         type,
         pint,
@@ -37,20 +37,9 @@ namespace cbor {
         error
     };
 
-    class decoder {
+    struct decoder {
+        void run(input& input, listener& listener);
     private:
-        listener *m_listener;
-        input *m_in;
         decoder_state m_state;
-        int m_currentLength;
-    public:
-        explicit decoder(input &in);
-        explicit decoder(input &in, listener &listener);
-        ~decoder();
-        void run();
-        void set_listener(listener &listener_instance);
     };
 }
-
-
-#endif //__CborDecoder_H_
