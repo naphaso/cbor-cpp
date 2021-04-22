@@ -40,8 +40,8 @@ int main() {
     { // decoding
         cbor::input input(output.data(), output.size());
         cbor::listener_debug listener;
-        cbor::decoder decoder(input, listener);
-        decoder.run();
+        cbor::decoder decoder;
+        decoder.run(input, listener);
     }
 
     return 0;
