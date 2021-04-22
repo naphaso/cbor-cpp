@@ -58,9 +58,6 @@ struct listener {
 protected:
 };
 
-using listener_ptr = std::shared_ptr<listener>;
-
-
 template <class T> inline void p(const std::string &tag, const T &value) {
   std::cout << "[" << tag << sizeof(T) << " = " << value << "]\n";
 }
