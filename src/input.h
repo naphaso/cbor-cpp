@@ -16,20 +16,13 @@
 
 #pragma once
 
-#include <memory>
+#include <vector>
 
 namespace cbor {
   
 
-    class input {
-    private:
-        uint8_t *_data;
-        int _size;
-        int m_offset;
-    public:
-        explicit input(void *data, int size);
-
-        ~input();
+    struct input {
+        explicit input(const std::vector<uint8_t>& data) : m_data(data), m_offset(0) {}
 
         bool has_bytes(int count);
 
@@ -43,6 +36,11 @@ namespace cbor {
 
         unsigned long long get_long();
 
-        void get_bytes(void *to, int count);
+        std::vector<uint8_t> get_bytes(int count);
+
+        std::string get_str(int count);
+    private:
+        std::vector<uint8_t> m_data{};
+        int m_offset{};
     };
 }

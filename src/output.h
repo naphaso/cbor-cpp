@@ -27,7 +27,7 @@ namespace cbor {
     struct output {
          explicit output(unsigned int inital_capacity = default_capacity);
 
-         uint8_t *data();
+         std::vector<uint8_t> data();
 
          size_t size();
 
