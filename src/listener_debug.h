@@ -25,7 +25,7 @@ namespace cbor {
     public:
         virtual void on_integer(int value) const noexcept override;
 
-        virtual void on_bytes(unsigned char *data, int size) const noexcept override;
+        virtual void on_bytes(uint8_t *data, int size) const noexcept override;
 
         virtual void on_string(std::string &str) const noexcept override;
 

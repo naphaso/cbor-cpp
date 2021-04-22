@@ -28,9 +28,9 @@ void decoder::run(input& input, listener& listener) {
     while(1) {
         if(m_state == decoder_state::type) {
             if(input.has_bytes(1)) {
-                unsigned char type = input.get_byte();
-                unsigned char majorType = type >> 5;
-                unsigned char minorType = (unsigned char) (type & 31);
+                uint8_t type = input.get_byte();
+                uint8_t majorType = type >> 5;
+                uint8_t minorType = (uint8_t) (type & 31);
 
                 switch(majorType) {
                     case 0: // positive integer
@@ -279,7 +279,7 @@ void decoder::run(input& input, listener& listener) {
             } else break;
         } else if(m_state == decoder_state::bytes_data) {
             if(input.has_bytes(m_currentLength)) {
-                unsigned char *data = new unsigned char[m_currentLength];
+                uint8_t *data = new uint8_t[m_currentLength];
                 input.get_bytes(data, m_currentLength);
                 m_state = decoder_state::type;
                 listener.on_bytes(data, m_currentLength);
@@ -307,7 +307,7 @@ void decoder::run(input& input, listener& listener) {
             } else break;
         } else if(m_state == decoder_state::string_data) {
             if(input.has_bytes(m_currentLength)) {
-                unsigned char *data = new unsigned char[m_currentLength];
+                uint8_t *data = new uint8_t[m_currentLength];
                 input.get_bytes(data, m_currentLength);
                 m_state = decoder_state::type;
                 std::string str((const char *)data, (size_t)m_currentLength);

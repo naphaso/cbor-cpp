@@ -39,7 +39,7 @@ namespace cbor {
 
         void write_int(unsigned long long value);
 
-        void write_bytes(const unsigned char *data, unsigned int size);
+        void write_bytes(const uint8_t *data, unsigned int size);
 
         void write_string(const char *data, unsigned int size);
 

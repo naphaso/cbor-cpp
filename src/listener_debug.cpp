@@ -22,7 +22,7 @@ void listener_debug::on_integer(int value) const noexcept {
     p("i", value);
 }
 
-void listener_debug::on_bytes(unsigned char *data, int size) const noexcept {
+void listener_debug::on_bytes(uint8_t *data, int size) const noexcept {
     p("b", data);
     p("len", size);
 }

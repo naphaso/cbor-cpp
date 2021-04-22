@@ -23,7 +23,7 @@ namespace cbor {
 
     class input {
     private:
-        unsigned char *_data;
+        uint8_t *_data;
         int _size;
         int m_offset;
     public:
@@ -33,7 +33,7 @@ namespace cbor {
 
         bool has_bytes(int count);
 
-        unsigned char get_byte();
+        uint8_t get_byte();
 
         unsigned short get_short();
 

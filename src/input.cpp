@@ -23,7 +23,7 @@
 using namespace cbor;
 
 input::input(void *data, int size) {
-    _data = (unsigned char *)data;
+    _data = (uint8_t *)data;
     _size = size;
     m_offset = 0;
 }
@@ -36,7 +36,7 @@ bool input::has_bytes(int count) {
     return _size - m_offset >= count;
 }
 
-unsigned char input::get_byte() {
+uint8_t input::get_byte() {
     return _data[m_offset++];
 }
 
