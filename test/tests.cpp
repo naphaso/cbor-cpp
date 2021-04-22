@@ -39,8 +39,8 @@ int main() {
 
     { // decoding
         cbor::input input(output.data(), output.size());
-        cbor::listener_debug listener;
-        cbor::decoder decoder(input, listener);
+        auto lp = std::make_shared<cbor::listener_debug>();
+        cbor::decoder decoder(input, std::move(lp));
         decoder.run();
     }
 

@@ -26,9 +26,9 @@ decoder::decoder(input &in) {
     m_state = decoder_state::type;
 }
 
-decoder::decoder(input &in, listener &listener) {
+decoder::decoder(input &in, listener_ptr listener) {
     m_in = &in;
-    m_listener = &listener;
+    m_listener = listener;
     m_state = decoder_state::type;
 }
 
@@ -36,12 +36,13 @@ decoder::~decoder() {
 
 }
 
-void decoder::set_listener(listener &listener_instance) {
-    m_listener = &listener_instance;
+void decoder::set_listener(listener_ptr listener) {
+    m_listener = listener;
 }
 
 void decoder::run() {
     unsigned int temp;
+
     while(1) {
         if(m_state == decoder_state::type) {
             if(m_in->has_bytes(1)) {
