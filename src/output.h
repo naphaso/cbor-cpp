@@ -25,11 +25,11 @@ namespace cbor {
     const int default_capacity = 256;
 
     struct output {
-        explicit output(unsigned int inital_capacity = default_capacity);
+         explicit output(unsigned int inital_capacity = default_capacity);
 
          uint8_t *data();
 
-         unsigned int size();
+         size_t size();
 
          void put_byte(uint8_t value);
 

@@ -28,7 +28,7 @@ uint8_t *output::data() {
     return m_buffer.data();
 }
 
-unsigned int output::size() {
+size_t output::size() {
     return m_buffer.size();
 }
 
