@@ -27,7 +27,7 @@ void listener_debug::on_bytes(uint8_t *data, int size) const noexcept {
     p("len", size);
 }
 
-void listener_debug::on_string(std::string &str) const noexcept {
+void listener_debug::on_string(const std::string &str) const noexcept {
     p("s", str);
 }
 
