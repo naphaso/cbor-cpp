@@ -19,7 +19,7 @@
 #include "cbor.h"
 
 int main() {
-    cbor::output_dynamic output;
+    cbor::output output;
 
     { //encoding
         cbor::encoder encoder(output);
