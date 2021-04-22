@@ -30,7 +30,7 @@ struct listener {
 
   virtual void on_bytes(uint8_t *data, int size) const noexcept {}
 
-  virtual void on_string(std::string &str) const noexcept {}
+  virtual void on_string(const std::string &str) const noexcept {}
 
   virtual void on_array(int size) const noexcept {}
 
