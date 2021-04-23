@@ -7,56 +7,64 @@
 
        http://www.apache.org/licenses/LICENSE-2.0
 
-	   Unless required by applicable law or agreed to in writing, software
-	   distributed under the License is distributed on an "AS IS" BASIS,
-	   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	   See the License for the specific language governing permissions and
-	   limitations under the License.
+           Unless required by applicable law or agreed to in writing, software
+           distributed under the License is distributed on an "AS IS" BASIS,
+           WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+   implied. See the License for the specific language governing permissions and
+           limitations under the License.
 */
 
-#ifndef CBOR_CPP_LISTENER_H
-#define CBOR_CPP_LISTENER_H
+#pragma once
 
+#include <iostream>
 #include <string>
 
 namespace cbor {
-    class listener {
-    public:
-        virtual void on_integer(int value) = 0;
 
-        virtual void on_float32(float value) = 0;
-        virtual void on_double(double value) = 0;
+struct listener {
+  virtual ~listener() = default;
 
-        virtual void on_bytes(unsigned char *data, int size) = 0;
+  virtual void on_integer(int ) const noexcept {}
 
-        virtual void on_string(std::string &str) = 0;
+  virtual void on_float32(float ) const noexcept {}
+  virtual void on_double(double ) const noexcept {}
 
-        virtual void on_array(int size) = 0;
+  virtual void on_bytes(uint8_t *, int ) const noexcept {}
 
-        virtual void on_map(int size) = 0;
+  virtual void on_string(const std::string &) const noexcept {}
 
-        virtual void on_tag(unsigned int tag) = 0;
+  virtual void on_array(int ) const noexcept {}
 
-        virtual void on_special(unsigned int code) = 0;
-        
-        virtual void on_bool(bool) = 0;
-        
-        virtual void on_null() = 0;
-        
-        virtual void on_undefined() = 0;
+  virtual void on_map(int ) const noexcept {}
 
-        virtual void on_error(const char *error) = 0;
+  virtual void on_tag(unsigned int ) const noexcept {}
 
-        virtual void on_extra_integer(unsigned long long value, int sign) {
-        }
+  virtual void on_special(unsigned int ) const noexcept {}
 
-        virtual void on_extra_tag(unsigned long long tag) {
-        }
+  virtual void on_bool(bool) const noexcept {}
 
-        virtual void on_extra_special(unsigned long long tag) {
-        }
-    };
+  virtual void on_null() const noexcept {}
+
+  virtual void on_undefined() const noexcept {}
+
+  virtual void on_error(const char *) const noexcept {}
+
+  virtual void on_extra_integer(unsigned long long ,
+                                int ) const noexcept {}
+
+  virtual void on_extra_tag(unsigned long long) const noexcept {}
+
+  virtual void on_extra_special(unsigned long long) const noexcept {}
+
+protected:
+};
+
+template <class T> inline void p(const std::string &tag, const T &value) {
+  std::cout << "[" << tag << sizeof(T) << " = " << value << "]\n";
 }
 
+template <> inline void p(const std::string &tag, const std::string &value) {
+  std::cout << "[" << tag << value.length() << " = '" << value << "']\n";
+}
 
-#endif // CBOR_CPP_LISTENER_H
+} // namespace cbor

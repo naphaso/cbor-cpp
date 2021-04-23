@@ -14,21 +14,28 @@
 	   limitations under the License.
 */
 
+#pragma once
 
-#ifndef __CborOutput_H_
-#define __CborOutput_H_
+#include <stdint.h>
+#include <vector>
+
+#include "output.h"
 
 namespace cbor {
-    class output {
-    public:
-        virtual unsigned char *data() = 0;
+    const int default_capacity = 256;
 
-        virtual unsigned int size() = 0;
+    struct output {
+         explicit output(unsigned int inital_capacity = default_capacity);
 
-        virtual void put_byte(unsigned char value) = 0;
+         std::vector<uint8_t> data();
 
-        virtual void put_bytes(const unsigned char *data, int size) = 0;
+         size_t size();
+
+         void put_byte(uint8_t value);
+
+         void put_bytes(const uint8_t *data, int size);
+
+    private:
+        std::vector<uint8_t> m_buffer;
     };
 }
-
-#endif //__CborOutput_H_

@@ -14,23 +14,21 @@
 	   limitations under the License.
 */
 
-#ifndef CBOR_CPP_INPUT_H
-#define CBOR_CPP_INPUT_H
+#pragma once
+
+#include <stdint.h>
+#include <vector>
+#include <string>
 
 namespace cbor {
-    class input {
-    private:
-        unsigned char *_data;
-        int _size;
-        int _offset;
-    public:
-        input(void *data, int size);
+  
 
-        ~input();
+    struct input {
+        explicit input(const std::vector<uint8_t>& data) : m_data(data), m_offset(0) {}
 
         bool has_bytes(int count);
 
-        unsigned char get_byte();
+        uint8_t get_byte();
 
         unsigned short get_short();
 
@@ -40,8 +38,11 @@ namespace cbor {
 
         unsigned long long get_long();
 
-        void get_bytes(void *to, int count);
+        std::vector<uint8_t> get_bytes(int count);
+
+        std::string get_str(int count);
+    private:
+        std::vector<uint8_t> m_data{};
+        size_t m_offset{};
     };
 }
-
-#endif // CBOR_CPP_INPUT_H

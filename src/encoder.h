@@ -15,8 +15,7 @@
 */
 
 
-#ifndef __CborEncoder_H_
-#define __CborEncoder_H_
+#pragma once
 
 #include "output.h"
 #include <string>
@@ -24,9 +23,9 @@
 namespace cbor {
     class encoder {
     private:
-        output *_out;
+        output *m_out;
     public:
-        encoder(output &out);
+        explicit encoder(output &out);
 
         ~encoder();
 
@@ -40,7 +39,7 @@ namespace cbor {
 
         void write_int(unsigned long long value);
 
-        void write_bytes(const unsigned char *data, unsigned int size);
+        void write_bytes(const uint8_t *data, unsigned int size);
 
         void write_string(const char *data, unsigned int size);
 
@@ -68,5 +67,3 @@ namespace cbor {
         void write_type_value(int major_type, unsigned long long value);
     };
 }
-
-#endif //__CborEncoder_H_

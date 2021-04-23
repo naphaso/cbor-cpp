@@ -15,42 +15,31 @@
 */
 
 
-#ifndef __CborDecoder_H_
-#define __CborDecoder_H_
+#pragma once
 
 #include "listener.h"
 #include "input.h"
 
 namespace cbor {
-    typedef enum {
-        STATE_TYPE,
-        STATE_PINT,
-        STATE_NINT,
-        STATE_BYTES_SIZE,
-        STATE_BYTES_DATA,
-        STATE_STRING_SIZE,
-        STATE_STRING_DATA,
-        STATE_ARRAY,
-        STATE_MAP,
-        STATE_TAG,
-        STATE_SPECIAL,
-        STATE_ERROR
-    } decoder_state;
+    
+    enum class decoder_state : uint8_t {
+        type,
+        pint,
+        nint,
+        bytes_size,
+        bytes_data,
+        string_size,
+        string_data,
+        array,
+        map,
+        tag,
+        special,
+        error
+    };
 
-    class decoder {
+    struct decoder {
+        void run(input& input, listener& listener);
     private:
-        listener *_listener;
-        input *_in;
-        decoder_state _state;
-        int _currentLength;
-    public:
-        decoder(input &in);
-        decoder(input &in, listener &listener);
-        ~decoder();
-        void run();
-        void set_listener(listener &listener_instance);
+        decoder_state m_state;
     };
 }
-
-
-#endif //__CborDecoder_H_

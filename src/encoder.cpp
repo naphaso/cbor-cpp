@@ -20,7 +20,7 @@ using namespace cbor;
 
 
 encoder::encoder(output &out) {
-    _out = &out;
+    m_out = &out;
 }
 
 encoder::~encoder() {
@@ -30,50 +30,50 @@ encoder::~encoder() {
 void encoder::write_type_value(int major_type, unsigned int value) {
     major_type <<= 5;
     if(value < 24) {
-        _out->put_byte((unsigned char) (major_type | value));
+        m_out->put_byte((uint8_t) (major_type | value));
     } else if(value < 256) {
-        _out->put_byte((unsigned char) (major_type | 24));
-        _out->put_byte((unsigned char) value);
+        m_out->put_byte((uint8_t) (major_type | 24));
+        m_out->put_byte((uint8_t) value);
     } else if(value < 65536) {
-        _out->put_byte((unsigned char) (major_type | 25));
-        _out->put_byte((unsigned char) (value >> 8));
-        _out->put_byte((unsigned char) value);
+        m_out->put_byte((uint8_t) (major_type | 25));
+        m_out->put_byte((uint8_t) (value >> 8));
+        m_out->put_byte((uint8_t) value);
     } else {
-        _out->put_byte((unsigned char) (major_type | 26));
-        _out->put_byte((unsigned char) (value >> 24));
-        _out->put_byte((unsigned char) (value >> 16));
-        _out->put_byte((unsigned char) (value >> 8));
-        _out->put_byte((unsigned char) value);
+        m_out->put_byte((uint8_t) (major_type | 26));
+        m_out->put_byte((uint8_t) (value >> 24));
+        m_out->put_byte((uint8_t) (value >> 16));
+        m_out->put_byte((uint8_t) (value >> 8));
+        m_out->put_byte((uint8_t) value);
     }
 }
 
 void encoder::write_type_value(int major_type, unsigned long long value) {
     major_type <<= 5;
     if(value < 24ULL) {
-        _out->put_byte((unsigned char) (major_type | value));
+        m_out->put_byte((uint8_t) (major_type | value));
     } else if(value < 256ULL) {
-        _out->put_byte((unsigned char) (major_type | 24));
-        _out->put_byte((unsigned char) value);
+        m_out->put_byte((uint8_t) (major_type | 24));
+        m_out->put_byte((uint8_t) value);
     } else if(value < 65536ULL) {
-        _out->put_byte((unsigned char) (major_type | 25));
-        _out->put_byte((unsigned char) (value >> 8));
-        _out->put_byte((unsigned char) value);
+        m_out->put_byte((uint8_t) (major_type | 25));
+        m_out->put_byte((uint8_t) (value >> 8));
+        m_out->put_byte((uint8_t) value);
     } else if(value < 4294967296ULL) {
-        _out->put_byte((unsigned char) (major_type | 26));
-        _out->put_byte((unsigned char) (value >> 24));
-        _out->put_byte((unsigned char) (value >> 16));
-        _out->put_byte((unsigned char) (value >> 8));
-        _out->put_byte((unsigned char) value);
+        m_out->put_byte((uint8_t) (major_type | 26));
+        m_out->put_byte((uint8_t) (value >> 24));
+        m_out->put_byte((uint8_t) (value >> 16));
+        m_out->put_byte((uint8_t) (value >> 8));
+        m_out->put_byte((uint8_t) value);
     } else {
-        _out->put_byte((unsigned char) (major_type | 27));
-        _out->put_byte((unsigned char) (value >> 56));
-        _out->put_byte((unsigned char) (value >> 48));
-        _out->put_byte((unsigned char) (value >> 40));
-        _out->put_byte((unsigned char) (value >> 32));
-        _out->put_byte((unsigned char) (value >> 24));
-        _out->put_byte((unsigned char) (value >> 16));
-        _out->put_byte((unsigned char) (value >> 8));
-        _out->put_byte((unsigned char) value);
+        m_out->put_byte((uint8_t) (major_type | 27));
+        m_out->put_byte((uint8_t) (value >> 56));
+        m_out->put_byte((uint8_t) (value >> 48));
+        m_out->put_byte((uint8_t) (value >> 40));
+        m_out->put_byte((uint8_t) (value >> 32));
+        m_out->put_byte((uint8_t) (value >> 24));
+        m_out->put_byte((uint8_t) (value >> 16));
+        m_out->put_byte((uint8_t) (value >> 8));
+        m_out->put_byte((uint8_t) value);
     }
 }
 
@@ -103,39 +103,39 @@ void encoder::write_int(int value) {
 
 void encoder::write_float(float value) {
   void* punny = &value;
-  _out->put_byte((unsigned char) (7<<5) | 26);
-  _out->put_byte(*((uint8_t*) punny+3));
-  _out->put_byte(*((uint8_t*) punny+2));
-  _out->put_byte(*((uint8_t*) punny+1));
-  _out->put_byte(*((uint8_t*) punny+0));
+  m_out->put_byte((uint8_t) (7<<5) | 26);
+  m_out->put_byte(*((uint8_t*) punny+3));
+  m_out->put_byte(*((uint8_t*) punny+2));
+  m_out->put_byte(*((uint8_t*) punny+1));
+  m_out->put_byte(*((uint8_t*) punny+0));
 }
 
 void encoder::write_double(double value) {
   void* punny = &value;
-  _out->put_byte((unsigned char) (7<<5) | 27);
-  _out->put_byte(*((uint8_t*) punny+7));
-  _out->put_byte(*((uint8_t*) punny+6));
-  _out->put_byte(*((uint8_t*) punny+5));
-  _out->put_byte(*((uint8_t*) punny+4));
-  _out->put_byte(*((uint8_t*) punny+3));
-  _out->put_byte(*((uint8_t*) punny+2));
-  _out->put_byte(*((uint8_t*) punny+1));
-  _out->put_byte(*((uint8_t*) punny+0));
+  m_out->put_byte((uint8_t) (7<<5) | 27);
+  m_out->put_byte(*((uint8_t*) punny+7));
+  m_out->put_byte(*((uint8_t*) punny+6));
+  m_out->put_byte(*((uint8_t*) punny+5));
+  m_out->put_byte(*((uint8_t*) punny+4));
+  m_out->put_byte(*((uint8_t*) punny+3));
+  m_out->put_byte(*((uint8_t*) punny+2));
+  m_out->put_byte(*((uint8_t*) punny+1));
+  m_out->put_byte(*((uint8_t*) punny+0));
 }
 
-void encoder::write_bytes(const unsigned char *data, unsigned int size) {
+void encoder::write_bytes(const uint8_t *data, unsigned int size) {
     write_type_value(2, size);
-    _out->put_bytes(data, size);
+    m_out->put_bytes(data, size);
 }
 
 void encoder::write_string(const char *data, unsigned int size) {
     write_type_value(3, size);
-    _out->put_bytes((const unsigned char *) data, size);
+    m_out->put_bytes((const uint8_t *) data, size);
 }
 
 void encoder::write_string(const std::string str) {
     write_type_value(3, (unsigned int) str.size());
-    _out->put_bytes((const unsigned char *) str.c_str(), (int) str.size());
+    m_out->put_bytes((const uint8_t *) str.c_str(), (int) str.size());
 }
 
 
@@ -157,16 +157,16 @@ void encoder::write_special(int special) {
 
 void encoder::write_bool(bool value) {
     if (value == true) {
-        _out->put_byte((unsigned char) 0xf5);
+        m_out->put_byte((uint8_t) 0xf5);
     } else {
-        _out->put_byte((unsigned char) 0xf4);
+        m_out->put_byte((uint8_t) 0xf4);
     }
 }
 
 void encoder::write_null() {
-    _out->put_byte((unsigned char) 0xf6);
+    m_out->put_byte((uint8_t) 0xf6);
 }
 
 void encoder::write_undefined() {
-    _out->put_byte((unsigned char) 0xf7);
+    m_out->put_byte((uint8_t) 0xf7);
 }

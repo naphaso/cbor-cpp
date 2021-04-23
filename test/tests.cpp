@@ -19,7 +19,7 @@
 #include "cbor.h"
 
 int main() {
-    cbor::output_dynamic output;
+    cbor::output output;
 
     { //encoding
         cbor::encoder encoder(output);
@@ -38,10 +38,10 @@ int main() {
     }
 
     { // decoding
-        cbor::input input(output.data(), output.size());
+        cbor::input input(output.data());
         cbor::listener_debug listener;
-        cbor::decoder decoder(input, listener);
-        decoder.run();
+        cbor::decoder decoder;
+        decoder.run(input, listener);
     }
 
     return 0;
