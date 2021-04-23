@@ -16,6 +16,11 @@ set_project_warnings(project_warnings)
 set(CMAKE_BUILD_TYPE Release)
 set(EXPORT_COMPILE_COMMANDS ON)
 
+# Set up some extra Conan dependencies based on our needs before loading Conan
+set(CONAN_EXTRA_REQUIRES "")
+set(CONAN_EXTRA_OPTIONS "")
+include(cmake/Conan.cmake)
+run_conan()
 
 
 set(SOURCE_FILES
