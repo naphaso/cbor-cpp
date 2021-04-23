@@ -31,12 +31,10 @@ set(SOURCE_FILES
     src/output.cpp
     )
 
-set(TEST_SOURCE_FILES
-    test/tests.cpp
-    )
-
 add_library(cborcpp SHARED ${SOURCE_FILES})
 target_link_libraries(cborcpp INTERFACE project_options)
+target_include_directories(cborcpp PUBLIC src)
 set_property(TARGET cborcpp PROPERTY CXX_STANDARD 14)
-add_executable(testing ${SOURCE_FILES} ${TEST_SOURCE_FILES})
-target_include_directories(testing PRIVATE src)
+
+enable_testing()
+add_subdirectory(test)
