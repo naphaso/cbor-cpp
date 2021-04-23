@@ -3,7 +3,7 @@ cbor-cpp
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/naphaso/cbor-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[[!build](https://github.com/Magolves/cbor-cpp/blob/master/.github/workflows/cmake.yml/badge.svg)]
+[![build](https://github.com/Magolves/cbor-cpp/blob/master/.github/workflows/cmake.yml/badge.svg)](https://github.com/Magolves/cbor-cpp/blob/master/.github/workflows/cmake.yml/badge.svg)
 
 CBOR C++ serialization library
 
