@@ -1,14 +1,12 @@
 cmake_minimum_required(VERSION 3.15)
 project(cborcpp)
 
+include(cmake/StandardProjectSettings.cmake)
+
 set(CMAKE_BUILD_TYPE Release)
 set(EXPORT_COMPILE_COMMANDS ON)
 
-# On Mac OS 'CXX_STANDARD' is not evaluated
-# Instead we have to set the compiler flag
-if (APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-endif() 
+
 
 set(SOURCE_FILES
     src/encoder.cpp
