@@ -5,6 +5,8 @@ cbor-cpp
 
 [![build](https://github.com/Magolves/cbor-cpp/blob/master/.github/workflows/cmake.yml/badge.svg)](https://github.com/Magolves/cbor-cpp/blob/master/.github/workflows/cmake.yml/badge.svg)
 
+![cmake](https://github.com/github/docs/actions/workflows/cmake.yml/badge.svg)
+
 CBOR C++ serialization library
 
 Just a simple SAX-like Concise Binary Object Representation (CBOR).
