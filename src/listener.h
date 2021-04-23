@@ -22,23 +22,24 @@
 namespace cbor {
 
 struct listener {
+  virtual ~listener() = default;
 
-  virtual void on_integer(int value) const noexcept {}
+  virtual void on_integer(int ) const noexcept {}
 
-  virtual void on_float32(float value) const noexcept {}
-  virtual void on_double(double value) const noexcept {}
+  virtual void on_float32(float ) const noexcept {}
+  virtual void on_double(double ) const noexcept {}
 
-  virtual void on_bytes(uint8_t *data, int size) const noexcept {}
+  virtual void on_bytes(uint8_t *, int ) const noexcept {}
 
-  virtual void on_string(const std::string &str) const noexcept {}
+  virtual void on_string(const std::string &) const noexcept {}
 
-  virtual void on_array(int size) const noexcept {}
+  virtual void on_array(int ) const noexcept {}
 
-  virtual void on_map(int size) const noexcept {}
+  virtual void on_map(int ) const noexcept {}
 
-  virtual void on_tag(unsigned int tag) const noexcept {}
+  virtual void on_tag(unsigned int ) const noexcept {}
 
-  virtual void on_special(unsigned int code) const noexcept {}
+  virtual void on_special(unsigned int ) const noexcept {}
 
   virtual void on_bool(bool) const noexcept {}
 
@@ -46,14 +47,14 @@ struct listener {
 
   virtual void on_undefined() const noexcept {}
 
-  virtual void on_error(const char *error) const noexcept {}
+  virtual void on_error(const char *) const noexcept {}
 
-  virtual void on_extra_integer(unsigned long long value,
-                                int sign) const noexcept {}
+  virtual void on_extra_integer(unsigned long long ,
+                                int ) const noexcept {}
 
-  virtual void on_extra_tag(unsigned long long tag) const noexcept {}
+  virtual void on_extra_tag(unsigned long long) const noexcept {}
 
-  virtual void on_extra_special(unsigned long long tag) const noexcept {}
+  virtual void on_extra_special(unsigned long long) const noexcept {}
 
 protected:
 };

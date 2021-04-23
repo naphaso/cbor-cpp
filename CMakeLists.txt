@@ -15,6 +15,7 @@ set_project_warnings(project_warnings)
 
 set(CMAKE_BUILD_TYPE Release)
 set(EXPORT_COMPILE_COMMANDS ON)
+option(BUILD_SHARED_LIBS "Enable compilation of shared libraries" OFF)
 
 # Set up some extra Conan dependencies based on our needs before loading Conan
 set(CONAN_EXTRA_REQUIRES "")
