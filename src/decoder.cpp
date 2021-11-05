@@ -300,6 +300,7 @@ void decoder::run() {
                 _in->get_bytes(data, _currentLength);
                 _state = STATE_TYPE;
                 _listener->on_bytes(data, _currentLength);
+                delete[] data;
             } else break;
         } else if(_state == STATE_STRING_SIZE) {
             if(_in->has_bytes(_currentLength)) {
@@ -329,6 +330,7 @@ void decoder::run() {
                 _state = STATE_TYPE;
                 std::string str((const char *)data, (size_t)_currentLength);
                 _listener->on_string(str);
+                delete[] data;
             } else break;
         } else if(_state == STATE_ARRAY) {
             if(_in->has_bytes(_currentLength)) {
