@@ -28,7 +28,7 @@ output_static::output_static(unsigned int capacity) {
 }
 
 output_static::~output_static() {
-    delete _buffer;
+    delete[] _buffer;
 }
 
 void output_static::put_byte(unsigned char value) {
